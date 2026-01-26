@@ -6,33 +6,33 @@ public class RungeKuttaBase {
     }
 
 
-    public void RK4(double startingPoint, double endingPoint, double numIterations, double posInicial) {
+    public void RK4(double startingPoint, double endingPoint, double numIterations, double initialPos) {
         double step = (endingPoint - startingPoint) / numIterations;
         double[] coefPosicion = new double[]{0, 0.5, 0.5, 1};
         double[] coefRunge = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
-        double pos = posInicial;
+        double position = initialPos;
 
         System.out.println("el valor de h es: " + step);
         for (int i = 0; i < numIterations; i++) {
             double time = startingPoint + i * step;
             double[] k = new double[coefRunge.length];
             for (int j = 0; j < coefPosicion.length; j++) {
-                double dpos = 0;
+                double positionLoopK = 0;
                 if (j > 0) {
-                    dpos = coefPosicion[j] * k[j - 1];
+                    positionLoopK = coefPosicion[j] * k[j - 1];
                 }
-                k[j] = funcionYPrima(time+, dpos+);
+                k[j] = funcionYPrima(time + coefPosicion[j] * step, position + positionLoopK);
                 System.out.println("  " + j + " " + k[j]);
             }
 
-            double dpos = 0;
+            double positionIncrement = 0;
             for (int j = 0; j < k.length; j++) {
-                dpos += coefRunge[j] * k[j];
+                positionIncrement += coefRunge[j] * k[j];
             }
-            pos += dpos;
-            System.out.println(time + " " + pos);
+            position += positionIncrement;
+            System.out.println(time + " " + position);
         }
     }
 
 }
-}
+
