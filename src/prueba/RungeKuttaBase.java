@@ -1,3 +1,5 @@
+package prueba;
+
 public class RungeKuttaBase {
 
     public double funcionYPrima(double time, double position) {

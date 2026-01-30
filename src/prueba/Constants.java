@@ -1,3 +1,5 @@
+package prueba;
+
 public class Constants {
     public static final double G = 2.9591220828411956e-04;
     public static double MASS_SUN =1;

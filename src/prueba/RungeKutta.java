@@ -1,3 +1,5 @@
+package prueba;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class RungeKutta {
             if (bodyLoop.equals(body)) continue;
             double GMr3 = -Constants.G * body.getMass() / Math.pow(body.distance(bodyLoop), 3);
             for (int j = 0; j < 3; j++) {
-                ac[j] = ac[j] + GMr3 * (bodyLoop.getPositionInitial()[j] - body.getPositionInitial()[j]);
+                ac[j] = ac[j] + GMr3 * (bodyLoop.getPosition()[j] - body.getPosition()[j]);
             }
         }
         body.setAceleration(ac);
@@ -56,29 +58,64 @@ public class RungeKutta {
         System.out.println("el valor de h es: " + h);
         for (int i = 0; i < N; i++) {
             double time = a + i * h;
-            for (int l = 0; l < bodies.size(); l++) {
-                Body bodyLoop = bodies.get(l);
-                double[][] k = new double[coefRunge.length][3];
-                for (int j = 0; j < coefPosicion.length; j++) {
-                    double[] dpos = new double[3];
+
+            double[][][] k = new double[bodies.size()][coefRunge.length][3];
+            double[][] dvel = new double[bodies.size()][3];
+            double[][] dpos = new double[bodies.size()][3];
+            for (int j = 0; j < coefPosicion.length; j++) {
+                for (int l = 0; l < bodies.size(); l++) {
                     if (j > 0) {
                         for (int m = 0; m < 3; m++) {
-                            dpos[m] = coefPosicion[j] * k[j - 1][m];
+                            dvel[l][m] = coefPosicion[j] * k[l][j - 1][m];
+                            dpos[l][m] = dvel[l][m] * h;
                         }
                     }
-                    k[j] = funcionYPrima(bodyLoop, h);
-                    System.out.println("  " + j + " " + k[j]);
-                }
 
-                double dpos = 0;
-                for (int j = 0; j < k.length; j++) {
-                    dpos += coefRunge[j] * k[j][i];
+
+                    Body bodyLoop = bodies.get(l);
+                    bodyLoop.position[0] = bodyLoop.getPositionInitial()[0] + dpos[l][0];
+                    bodyLoop.position[1] = bodyLoop.getPositionInitial()[1] + dpos[l][1];
+                    bodyLoop.position[2] = bodyLoop.getPositionInitial()[2] + dpos[l][2];
+
+                    k[l][j] = funcionYPrima(bodyLoop, h);
+                    //System.out.println("  " + j + " " + k[j]);
                 }
-                pos += dpos;
-                time += h;
-                System.out.println(time + " " + pos);
             }
+
+            for (int l = 0; l < bodies.size(); l++) {
+                Body bodyLoop = bodies.get(l);
+
+                double[] dvelR = new double[3];
+                for (int j = 0; j < coefRunge.length; j++) {
+                    for (int t = 0; t < 3; t++) {
+                        dvelR[t] += coefRunge[j] * k[l][j][t];
+                    }
+
+                }
+                for (int t = 0; t < 3; t++) {
+                    dvelR[t] += bodyLoop.getVelocitiesInitial()[t];
+                }
+                bodyLoop.setVelocitiesInitial(dvelR);
+
+                double[] dposR = new double[3];
+                double[] posF = new double[3];
+
+                for (int j = 0; j < 3; j++) {
+                    dposR[j] = dvelR[j] * h;
+                    posF[j] = dposR[j] + bodyLoop.getPositionInitial()[j];
+                }
+                bodyLoop.setPositionInitial(posF);
+
+            }
+
         }
 
+        for (int l = 0; l < bodies.size(); l++) {
+            Body bodyLoop = bodies.get(l);
+            double[] p = bodyLoop.getPositionInitial();
+            double[] v = bodyLoop.getVelocitiesInitial();
+            System.out.println(bodyLoop.getName());
+            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
+        }
     }
 }

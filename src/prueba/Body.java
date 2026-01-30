@@ -1,10 +1,13 @@
+package prueba;
+
 public class Body {
     private String name;
     private double mass;
     private double[] positionInitial;
     private double[] velocitiesInitial;
     private double[] aceleration;
-    private double[] deltas;
+    public double[] position;
+    public double[] velocities;
 
     public Body(String name, double mass, double[] positionInitial, double[] velocitiesInitial) {
         this.name = name;
@@ -12,6 +15,8 @@ public class Body {
         this.positionInitial = positionInitial;
         this.velocitiesInitial = velocitiesInitial;
         this.aceleration = new double[3];
+        position = positionInitial.clone();
+        velocities = velocitiesInitial.clone();
     }
 
     public String getName() {
@@ -28,6 +33,10 @@ public class Body {
 
     public void setAceleration(double[] aceleration) {
         this.aceleration = aceleration;
+    }
+
+    public double[] getPosition() {
+        return position;
     }
 
     public double[] getPositionInitial() {
@@ -56,11 +65,9 @@ public class Body {
 
     public double distance(Body body) {
         double r_2 = 0;
-        for (int i = 0; i < positionInitial.length; i++) {
-            r_2 += Math.pow(this.positionInitial[i] - body.getPositionInitial()[i], 2);
+        for (int i = 0; i < position.length; i++) {
+            r_2 += Math.pow(this.position[i] - body.getPosition()[i], 2);
         }
         return Math.sqrt(r_2);
     }
-
-
 }

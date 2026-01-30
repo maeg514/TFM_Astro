@@ -1,8 +1,0 @@
-import java.util.ArrayList;
-void main() {
-    RungeKuttaBase rungeKuttaBase = new RungeKuttaBase();
-    double posInicial=1;
-    rungeKuttaBase.RK4(1,1.5,20,1);
-    ArrayList<String> milista = new ArrayList<>();
-    //rungeKutta.RK4(0,0.2,2,1);
-}
