@@ -5,7 +5,7 @@ public class Body {
     private double mass;
     private double[] positionInitial;
     private double[] velocitiesInitial;
-    private double[] aceleration;
+    private double[] acceleration;
     public double[] position;
     public double[] velocities;
 
@@ -14,9 +14,9 @@ public class Body {
         this.mass = mass;
         this.positionInitial = positionInitial;
         this.velocitiesInitial = velocitiesInitial;
-        this.aceleration = new double[3];
-        position = positionInitial.clone();
-        velocities = velocitiesInitial.clone();
+        this.acceleration = new double[3];
+        this.position = positionInitial.clone();
+        this.velocities = velocitiesInitial.clone();
     }
 
     public String getName() {
@@ -28,11 +28,11 @@ public class Body {
     }
 
     public double[] getAceleration() {
-        return aceleration;
+        return acceleration;
     }
 
     public void setAceleration(double[] aceleration) {
-        this.aceleration = aceleration;
+        this.acceleration = aceleration;
     }
 
     public double[] getPosition() {
