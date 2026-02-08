@@ -10,80 +10,87 @@ public class RungeKutta4 {
         addBodies();
     }
 
-    public double[] funcionYPrima(Body body, double h) {
+    public void funcionYPrima(Body body, double h) {
         double[] ac = new double[3];
         for (int i = 0; i < bodies.size(); i++) {
             Body bodyLoop = bodies.get(i);
             if (bodyLoop.equals(body)) continue;
-            double GMr3 = -Constants.G * body.getMass() / Math.pow(body.distance(bodyLoop), 3);
+            double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(body.distance(bodyLoop), 3);
             for (int j = 0; j < 3; j++) {
-                ac[j] = ac[j] + GMr3 * (bodyLoop.getPosition()[j] - body.getPosition()[j]);
+                ac[j] = ac[j] + GMr3 * (body.getPosition(j) - bodyLoop.getPosition(j));
             }
         }
         body.setAceleration(ac);
-        return new double[]{ac[0] * h, ac[1] * h, ac[2] * h};
     }
 
-    public void RK4(double a, double b, double N) {
-        double h = (b - a) / N;
+    public void RK4(double a, double b, double h) {
         double[] coefPosicion = new double[]{0, 0.5, 0.5, 1};
         double[] coefRunge = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
 
+        int N = (int) ((b - a) / h);
         System.out.println("el valor de h es: " + h);
-        for (int i = 0; i < N; i++) {
-            double time = a + i * h;
+        double time = 0;
+        for (int i = 0; i < N + 1; i++) {
+            time = a + i * h;
+            if (i == N) {
+                double lastH = b - time;
+                if (lastH == 0) break;
+                h = lastH;
+            }
 
-            double[][][] k = new double[bodies.size()][coefRunge.length][3];
-            double[][] dvel = new double[bodies.size()][3];
-            double[][] dpos = new double[bodies.size()][3];
+            double[][][] k = new double[bodies.size()][coefRunge.length][6];
+            //double[][] dvel = new double[bodies.size()][3];
+            //double[][] dpos = new double[bodies.size()][3];
             for (int j = 0; j < coefPosicion.length; j++) {
-                for (int l = 0; l < bodies.size(); l++) {
-                    if (j > 0) {
+                if (j > 0) {
+                    for (int l = 0; l < bodies.size(); l++) {
+                        Body bodyLoop = bodies.get(l);
                         for (int m = 0; m < 3; m++) {
-                            dvel[l][m] = coefPosicion[j] * k[l][j - 1][m];
-                            dpos[l][m] = dvel[l][m] * h;
+                            bodyLoop.position[m] = coefPosicion[j] * k[l][j - 1][m];
+                            bodyLoop.velocities[m] = coefPosicion[j] * k[l][j - 1][m + 3];
                         }
                     }
+                }
 
-
+                for (int l = 0; l < bodies.size(); l++) {
                     Body bodyLoop = bodies.get(l);
-                    bodyLoop.position[0] = bodyLoop.getPositionInitial()[0] + dpos[l][0];
-                    bodyLoop.position[1] = bodyLoop.getPositionInitial()[1] + dpos[l][1];
-                    bodyLoop.position[2] = bodyLoop.getPositionInitial()[2] + dpos[l][2];
+                    funcionYPrima(bodyLoop, h);
+                }
 
-                    k[l][j] = funcionYPrima(bodyLoop, h);
-                    //System.out.println("  " + j + " " + k[j]);
+                for (int l = 0; l < bodies.size(); l++) {
+                    Body bodyLoop = bodies.get(l);
+                    for (int m = 0; m < 3; m++) {
+                        k[l][j][m + 3] = bodyLoop.getAceleration()[m] * h;
+                        k[l][j][m] = bodyLoop.getVelocity(m) * h;
+                    }
                 }
             }
 
             for (int l = 0; l < bodies.size(); l++) {
                 Body bodyLoop = bodies.get(l);
-
-                double[] dvelR = new double[3];
-                for (int j = 0; j < coefRunge.length; j++) {
-                    for (int t = 0; t < 3; t++) {
-                        dvelR[t] += coefRunge[j] * k[l][j][t];
+                double[] p = bodyLoop.getPositionInitial();
+                double[] v = bodyLoop.getVelocitiesInitial();
+                for (int m = 0; m < 3; m++) {
+                    double positionIncrement = 0;
+                    double velIncrement = 0;
+                    for (int j = 0; j < coefRunge.length; j++) {
+                        positionIncrement += coefRunge[j] * k[l][j][m];
+                        velIncrement += coefRunge[j] * k[l][j][m + 3];
                     }
+                    p[m] += positionIncrement;
+                    v[m] += velIncrement;
 
+                    //bodyLoop.velocities[m] = bodyLoop.position[m] = 0; // Es mas rapido ?
                 }
-                for (int t = 0; t < 3; t++) {
-                    dvelR[t] += bodyLoop.getVelocitiesInitial()[t];
-                }
-                bodyLoop.setVelocitiesInitial(dvelR);
-
-                double[] dposR = new double[3];
-                double[] posF = new double[3];
-
-                for (int j = 0; j < 3; j++) {
-                    dposR[j] = dvelR[j] * h;
-                    posF[j] = dposR[j] + bodyLoop.getPositionInitial()[j];
-                }
-                bodyLoop.setPositionInitial(posF);
-
+                bodyLoop.setPositionInitial(p);//por clarificar
+                bodyLoop.setVelocitiesInitial(v);
+                bodyLoop.position = new double[3];
+                bodyLoop.velocities = new double[3];
             }
-
+            time += h;
         }
 
+        System.out.println("Time (integration end): " + time);
         for (int l = 0; l < bodies.size(); l++) {
             Body bodyLoop = bodies.get(l);
             double[] p = bodyLoop.getPositionInitial();
@@ -93,7 +100,7 @@ public class RungeKutta4 {
         }
     }
 
-    private void addBodies(){
+    private void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
         Body mercury = new Body("Mercury", Constants.MASS_MERCURY, new double[]{-0.1300936053754522, -0.40059372164232543, -0.20048930201672596}, new double[]{0.021366395668016163, -0.004926299692875428, -0.004847433077772866});
         Body venus = new Body("Venus", Constants.MASS_VENUS, new double[]{-0.718302296345389, -0.04627424670211335, 0.02464063845542861}, new double[]{7.981175157753219E-4, -0.018491837481062413, -0.008369735338020125});
@@ -120,5 +127,7 @@ public class RungeKutta4 {
         bodies.add(saturn);
         bodies.add(uranus);
         bodies.add(neptune);
+        bodies.add(moon);
+        bodies.add(pluto);
     }
 }

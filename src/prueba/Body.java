@@ -15,8 +15,8 @@ public class Body {
         this.positionInitial = positionInitial;
         this.velocitiesInitial = velocitiesInitial;
         this.acceleration = new double[3];
-        this.position = positionInitial.clone();
-        this.velocities = velocitiesInitial.clone();
+        this.position = new double[3];
+        this.velocities = new double[3];
     }
 
     public String getName() {
@@ -33,10 +33,6 @@ public class Body {
 
     public void setAceleration(double[] aceleration) {
         this.acceleration = aceleration;
-    }
-
-    public double[] getPosition() {
-        return position;
     }
 
     public double[] getPositionInitial() {
@@ -63,10 +59,18 @@ public class Body {
         this.positionInitial = positionInitial;
     }
 
+    public double getPosition(int j) {
+        return positionInitial[j] + position[j];
+    }
+
+    public double getVelocity(int j) {
+        return velocitiesInitial[j] + velocities[j];
+    }
+
     public double distance(Body body) {
         double r_2 = 0;
         for (int i = 0; i < position.length; i++) {
-            r_2 += Math.pow(this.position[i] - body.getPosition()[i], 2);
+            r_2 += Math.pow(this.getPosition(i) - body.getPosition(i), 2);
         }
         return Math.sqrt(r_2);
     }
