@@ -2,6 +2,8 @@ package prueba;
 
 public class Constants {
     public static final double G = 2.9591220828411956e-04;
+    public static final double c = (299792458 * 0.001 / 149597870.7) * 86400.0;// En UA
+    public static final double mu = G / Math.pow(c, 2);
     public static double MASS_SUN = 1;
     public static final double MASS_MERCURY = 1.660120825489089E-7; //1/6023657.944929;
     public static final double MASS_VENUS = 2.447838287796944E-6; //1/408523.718656;
@@ -20,5 +22,17 @@ public class Constants {
     //Ascii jpl ephemerides
 
     //Hay una incertidumbre en la masa de los planetas, por eso hay una diferencia entre las masas en las distintas fuentes
+
+    public static double dateToJulianDay(int year, int month, int day, int hour, int minute, boolean julian) {
+        if (month < 3) {
+            year = year - 1;
+            month = month + 12;
+        }
+        int a = year / 100;
+        int b = 0;
+        double c = (hour + minute / 60.0) / 24.0;
+        if (!julian) b = 2 - a + a / 4;
+        return (int) (365.25 * (year + 4716)) + (int) (30.6001 * (month + 1)) + day + b - 1524.5 + c;
+    }
 
 }

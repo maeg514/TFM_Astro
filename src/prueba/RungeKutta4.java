@@ -15,6 +15,25 @@ public class RungeKutta4 {
         for (int i = 0; i < bodies.size(); i++) {
             Body bodyLoop = bodies.get(i);
             if (bodyLoop.equals(body)) continue;
+
+
+            if (bodyLoop.getName().equals("Sun")) {
+                double pv = 0, v2 = 0;
+                for (int j = 0; j < 3; j++) {
+                    double dp = body.getPosition(j) - bodyLoop.getPosition(j);
+                    double dv = body.getVelocity(j) - bodyLoop.getVelocity(j);
+                    v2 += dv * dv;
+                    pv += dp * dv;
+                }
+                for (int j = 0; j < 3; j++) {
+                    double a = (4 * Constants.G * (body.getPosition(j) - bodyLoop.getPosition(j)) / Math.pow(body.distance(bodyLoop), 4));
+                    double b = (v2 * (body.getPosition(j) - bodyLoop.getPosition(j)) / Math.pow(body.distance(bodyLoop), 3));
+                    double c = (4 * pv / Math.pow(body.distance(bodyLoop), 3)) * (body.getVelocity(j) - bodyLoop.getVelocity(j));
+                    ac[j] += Constants.mu * (a - b + c);
+                }
+                //Metodo diferente
+            }
+
             double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(body.distance(bodyLoop), 3);
             for (int j = 0; j < 3; j++) {
                 ac[j] = ac[j] + GMr3 * (body.getPosition(j) - bodyLoop.getPosition(j));
@@ -91,6 +110,7 @@ public class RungeKutta4 {
         }
 
         System.out.println("Time (integration end): " + time);
+
         for (int l = 0; l < bodies.size(); l++) {
             Body bodyLoop = bodies.get(l);
             double[] p = bodyLoop.getPositionInitial();
@@ -98,6 +118,9 @@ public class RungeKutta4 {
             System.out.println(bodyLoop.getName());
             System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
         }
+
+        ra_dec();
+
     }
 
     private void addBodies() {
@@ -129,5 +152,26 @@ public class RungeKutta4 {
         bodies.add(neptune);
         bodies.add(moon);
         bodies.add(pluto);
+        bodies.add(apophis);
+    }
+
+    public void ra_dec() {
+        //arctan(y/x)
+        //arctan(z/h)
+        double[][] dist_times = new double[bodies.size()-1][2];
+        double[][] ra_dec = new double[bodies.size()-1][2];
+        Body earth = bodies.get(3);
+        for (int i = 0; i < bodies.size()-1; i++) {
+            Body bodyLoop = bodies.get(i);
+            if (!bodyLoop.equals(earth)) {
+                dist_times[i][0] = earth.distance(bodyLoop);
+                dist_times[i][1] = dist_times[i][0] / Constants.c;
+                double[] pos = bodyLoop.getPositionInitial();
+                double h = Math.sqrt(Math.pow(pos[0], 2)+Math.pow(pos[1], 2));
+                ra_dec[i][0] = Math.atan(pos[0]/pos[1]);
+                ra_dec[i][1] = Math.atan(pos[2]/h);
+            }
+            System.out.println(dist_times[i][1]);
+        }
     }
 }
