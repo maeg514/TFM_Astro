@@ -62,9 +62,23 @@ public class Body {
     public double getPosition(int j) {
         return positionInitial[j] + position[j];
     }
+    public double[] getPosition() {
+        double[] pos = new double[3];
+        for (int i = 0; i < 3; i++) {
+            pos[i] = positionInitial[i] + position[i];
+        }
+        return pos;
+    }
 
     public double getVelocity(int j) {
         return velocitiesInitial[j] + velocities[j];
+    }
+    public double[] getVelocity() {
+        double[] vel = new double[3];
+        for (int i = 0; i < 3; i++) {
+            vel[i] = velocitiesInitial[i] + velocities[i];
+        }
+        return vel;
     }
 
     public double distance(Body body) {
