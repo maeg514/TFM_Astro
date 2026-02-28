@@ -1,8 +1,9 @@
 package prueba;
 
 public class Constants {
-    public static final double G = 2.9591220828411956e-04;
-    public static final double c = (299792458 * 0.001 / 149597870.7) * 86400.0;// En UA
+    public static final double G = 2.9591220828411956E-04;
+    public static final double UA = 149597870.7;
+    public static final double c = (299792458 * 0.001 / UA) * 86400.0;// En UA/dia
     public static final double mu = G / Math.pow(c, 2);
     public static double MASS_SUN = 1;
     public static final double MASS_MERCURY = 1.660120825489089E-7; //1/6023657.944929;
@@ -17,7 +18,10 @@ public class Constants {
     public static final double MASS_PLUTO = 7.350478973158631E-9; //1/136045556.167380;
 
 
-    public static final double MASS_CERES = 4.719142e-10;
+    public static final double MASS_CERES = 4.719142E-10;
+    public static final double EARTH_RADIUS = 6378.13659999999982 / UA;
+    public static final double J2_DIMENSIONLESS = 0.00108262539;
+    public static final double J2 = J2_DIMENSIONLESS * Math.pow(EARTH_RADIUS, 2) * G * MASS_EARTH;
 
     //Ascii jpl ephemerides
 

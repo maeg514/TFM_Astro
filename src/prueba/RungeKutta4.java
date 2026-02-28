@@ -21,7 +21,11 @@ public class RungeKutta4 {
 
 
             if (bodyLoop.getName().equals("Sun")) {
-                relativisticAcceleration2(body, bodyLoop, ac);
+                relativisticAcceleration(body, bodyLoop, ac);
+                //if (body.getName().equals("Apophis")) ngfApop
+            }
+            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
+                earthsFlatteningFactor(body, bodyLoop, ac);
             }
 
             double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(distance, 3);
@@ -112,7 +116,7 @@ public class RungeKutta4 {
 
     }
 
-    private void relativisticAcceleration2(Body body, Body bodyLoop, double[] ac) {
+    private void relativisticAcceleration(Body body, Body bodyLoop, double[] ac) {
         double pv = 0, v2 = 0;
         double[] posBody = body.getPosition();
         double[] velBody = body.getVelocity();
@@ -133,20 +137,41 @@ public class RungeKutta4 {
         }
     }
 
-    private void relativisticAcceleration(Body body, Body bodyLoop, double[] ac) {
-        double pv = 0, v2 = 0;
-        for (int j = 0; j < 3; j++) {
-            double dp = body.getPosition(j) - bodyLoop.getPosition(j);
-            double dv = body.getVelocity(j) - bodyLoop.getVelocity(j);
-            v2 += dv * dv;
-            pv += dp * dv;
+    private void earthsFlatteningFactor(Body body, Body bodyLoop, double[] ac) {
+        double[] vectorAux = new double[3];
+        double[] posBody = body.getPosition();
+        double[] posBodyLoop = bodyLoop.getPosition();
+        for (int i = 0; i < 3; i++) {
+            vectorAux[i] = posBodyLoop[i] - posBody[i];
         }
-        for (int j = 0; j < 3; j++) {
-            double a = (4 * Constants.G * (body.getPosition(j) - bodyLoop.getPosition(j)) / Math.pow(body.distance(bodyLoop), 4));
-            double b = (v2 * (body.getPosition(j) - bodyLoop.getPosition(j)) / Math.pow(body.distance(bodyLoop), 3));
-            double c = (4 * pv / Math.pow(body.distance(bodyLoop), 3)) * (body.getVelocity(j) - bodyLoop.getVelocity(j));
-            ac[j] += Constants.mu * (a - b + c);
+        double factor = -Constants.J2 / Math.pow(body.distance(bodyLoop), 7);
+        ac[0] += factor * vectorAux[0] * (6 * Math.pow(vectorAux[2], 2) - 1.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
+        ac[1] += factor * vectorAux[1] * (6 * Math.pow(vectorAux[2], 2) - 1.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
+        ac[2] += factor * vectorAux[2] * (3 * Math.pow(vectorAux[2], 2) - 4.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
+    }
+
+    // Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.
+    private void apophisNGF(double[] pv, double r, double[] gravity, double f) {
+        // r dot v vector
+        double rv = 0;
+        for (int k = 0; k < 3; k++) {
+            rv += pv[k] * pv[k + 3];
         }
+
+        // Within-orbital-plane transverse vector components
+        double r2 = r * r;
+        double tx = r2 * pv[3] - rv * pv[0];
+        double ty = r2 * pv[4] - rv * pv[1];
+        double tz = r2 * pv[5] - rv * pv[2];
+
+        // Multiplication factors. NGF (A) values are read in AU/s^2. a3 = 0 for Apophis
+        double a1 = 4.999999873689E-13 / r;
+        double a2 = -2.901766720242E-14 / Math.sqrt(tx * tx + ty * ty + tz * tz);
+
+        // X, Y and Z components of non-gravitational acceleration
+        gravity[0] += f * (a1 * pv[0] + a2 * tx) / r2;
+        gravity[1] += f * (a1 * pv[1] + a2 * ty) / r2;
+        gravity[2] += f * (a1 * pv[2] + a2 * tz) / r2;
     }
 
     public void ra_dec() {
