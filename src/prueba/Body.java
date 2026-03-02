@@ -107,11 +107,11 @@ public class Body {
         return vectorDistance;
     }
 
-    public void ra_dec(Body body, boolean real) {
+    public void ra_dec(Body body, boolean real) {//printear distancias tambien
         double ra, dec;
         double distance = this.distance(body);
         double time = distance / Constants.c;
-        double[] skyPosition = body.getPositionInitial();
+        double[] skyPosition = body.getPositionInitial().clone();
         double[] velocity = body.getVelocitiesInitial();
         if (real) {
             for (int j = 0; j < 3; j++) {
@@ -119,9 +119,9 @@ public class Body {
             }
         }
         skyPosition = distanceVector(skyPosition);
-        double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2));
+        double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2)); //Math.hypot
         ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
-        dec = Math.asin(skyPosition[2] / h) * 180 / Math.PI;
+        dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
         System.out.println(body.getName() + " | " + ra + ": " + dec);
     }
 }

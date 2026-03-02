@@ -1,10 +1,13 @@
 package prueba;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class RungeKutta4 {
     List<Body> bodies = new ArrayList<>();
+    Scanner teclado = new Scanner(System.in);
 
     public RungeKutta4() {
         addBodies();
@@ -22,7 +25,7 @@ public class RungeKutta4 {
 
             if (bodyLoop.getName().equals("Sun")) {
                 relativisticAcceleration(body, bodyLoop, ac);
-                //if (body.getName().equals("Apophis")) ngfApop
+                //if (body.getName().equals("Apophis")) apophisNGF(body,bodyLoop,ac);
             }
             if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
                 earthsFlatteningFactor(body, bodyLoop, ac);
@@ -49,7 +52,7 @@ public class RungeKutta4 {
                 double lastH = b - time;
                 if (lastH == 0) break;
                 h = lastH;
-            }
+            }//Comprobar si llega hasta el final del tiempo de integracion
 
             double[][][] k = new double[bodies.size()][coefRunge.length][6];
             //double[][] dvel = new double[bodies.size()][3];
@@ -105,15 +108,22 @@ public class RungeKutta4 {
 
         System.out.println("Time (integration end): " + time);
 
-        for (Body bodyLoop : bodies) {
-            double[] p = bodyLoop.getPositionInitial();
-            double[] v = bodyLoop.getVelocitiesInitial();
-            System.out.println(bodyLoop.getName());
-            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
+        String approveChanges = "y";
+        /*if (changesChecking()){
+            System.out.println("¿Desea actualizar los valores de los cuerpos? (y/n)");
+            approveChanges = teclado.next();
+        }*/
+
+        if (approveChanges.equals("y")){
+            for (Body bodyLoop : bodies) {
+                double[] p = bodyLoop.getPositionInitial();
+                double[] v = bodyLoop.getVelocitiesInitial();
+                System.out.println(bodyLoop.getName());
+                System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
+            }
+            ra_dec();
+            changesChecking();
         }
-
-        ra_dec();
-
     }
 
     private void relativisticAcceleration(Body body, Body bodyLoop, double[] ac) {
@@ -151,37 +161,87 @@ public class RungeKutta4 {
     }
 
     // Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.
-    private void apophisNGF(double[] pv, double r, double[] gravity, double f) {
-        // r dot v vector
-        double rv = 0;
-        for (int k = 0; k < 3; k++) {
-            rv += pv[k] * pv[k + 3];
+    private void apophisNGF(Body body, Body bodyLoop, double[] ac) {
+        double[] posAux = new double[3];
+        double[] velAux = new double[3];
+        double[] posBody = body.getPosition();
+        double[] posBodyLoop = bodyLoop.getPosition();
+        double[] velBody = body.getVelocity();
+        double[] velBodyLoop = bodyLoop.getVelocity();
+        double pv = 0;
+        for (int i = 0; i < 3; i++) {
+            posAux[i] = posBodyLoop[i] - posBody[i];
+            velAux[i] = velBodyLoop[i] - velBody[i];
+            pv += posAux[i] * velAux[i];
         }
 
         // Within-orbital-plane transverse vector components
+        double r = body.distance(bodyLoop);
         double r2 = r * r;
-        double tx = r2 * pv[3] - rv * pv[0];
-        double ty = r2 * pv[4] - rv * pv[1];
-        double tz = r2 * pv[5] - rv * pv[2];
+        double tx = r2 * velAux[0] - pv * posAux[0];
+        double ty = r2 * velAux[1] - pv * posAux[1];
+        double tz = r2 * velAux[2] - pv * posAux[2];
 
         // Multiplication factors. NGF (A) values are read in AU/s^2. a3 = 0 for Apophis
         double a1 = 4.999999873689E-13 / r;
         double a2 = -2.901766720242E-14 / Math.sqrt(tx * tx + ty * ty + tz * tz);
 
         // X, Y and Z components of non-gravitational acceleration
-        gravity[0] += f * (a1 * pv[0] + a2 * tx) / r2;
-        gravity[1] += f * (a1 * pv[1] + a2 * ty) / r2;
-        gravity[2] += f * (a1 * pv[2] + a2 * tz) / r2;
+        ac[0] += (a1 * posAux[0] + a2 * tx) / r2;
+        ac[1] += (a1 * posAux[1] + a2 * ty) / r2;
+        ac[2] += (a1 * posAux[2] + a2 * tz) / r2;
     }
 
-    public void ra_dec() {
+    public void ra_dec() {//escoger body
         //arctan(y/x)
         //arctan(z/h)
         Body earth = bodies.get(3);
-        for (Body skyObject: bodies){
+        for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
-            earth.ra_dec(skyObject,true);
+            earth.ra_dec(skyObject, true);
         }
+    }
+
+    private boolean changesChecking() {
+        boolean change = false;
+        double[][] vectorChecking = {
+                {-0.049242309887471504, 0.074132509477252, 0.0330492542781804, -6.638840273079683E-6, 1.1333410836986347E-5, 5.020739495743468E-6},
+                {-0.1760739199818666, 0.32571526005188833, 0.18059095619818513, -0.03143059302208097, -0.010193391021771555, -0.0021899646768472115},
+                {0.5307088992946106, 0.4815037437874529, 0.17966823928803466, -0.012152513410775403, 0.014445939303657404, 0.00726875747899652},
+                {-0.9666535235112791, -0.29766690149825836, -0.12811318383017878, 0.006667698406407208, -0.014492822729155636, -0.006281995555942135},
+                {-1.6366682834390605, -0.28430391930889515, -0.08855073053025654, 0.0037495327509574727, -0.011242415373455425, -0.005258152056345891},
+                {-5.092976239731671, -1.868012145731055, -0.6766246251589241, 0.0027644573490153133, -0.006065485255554673, -0.0026671084712878933},
+                {6.620173515580458, 5.99993594982585, 2.1933532843135004, -0.004135579566238353, 0.003682250293646825, 0.001699081484892807},
+                {5.481440243214165, 17.010830890611494, 7.372570789687953, -0.003801828505975123, 8.534638617653026E-4, 4.2754997070165826E-4},
+                {29.491198701523263, 4.311806999682784, 1.0320551034608143, -4.7644648041138786E-4, 0.0028954220548403336, 0.0011971054423927895},
+                {-0.9641781702968775, -0.29675226035312885, -0.12746905047546234, 0.006437865411518236, -0.014017476469827213, -0.0060915920244318},
+                {22.342215393477137, -24.52871026222943, -14.39150456821061, 0.0025554516150016306, 0.0014851518811703145, -3.071722236487479E-4},
+                {-0.9668011993134284, -0.2974885677327149, -0.127997618542421, 0.010258531574114051, -0.013057629302864146, -0.004487815348114064},
+        };
+
+        double[][] differences = new double[bodies.size()][6];
+
+        for (int i = 0; i < bodies.size(); i++) {
+            Body bodyCheck = bodies.get(i);
+            double[] posCheck = bodyCheck.getPositionInitial();
+            double[] velCheck = bodyCheck.getVelocitiesInitial();
+            for (int j = 0; j < 3; j++) {
+                differences[i][j] = posCheck[j] - vectorChecking[i][j];
+                differences[i][j + 3] = velCheck[j] - vectorChecking[i][j + 3];
+                if (!change) {
+                    if (differences[i][j] != 0 || differences[i][j + 3] != 0) change = true;
+                }
+            }
+        }
+
+        for (double[] fila : differences) {
+            System.out.println(Arrays.toString(fila));
+        }
+        return change;
+    }
+
+    private void saveResult() {
+
     }
 
     private void addBodies() {
