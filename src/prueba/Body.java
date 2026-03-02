@@ -62,6 +62,7 @@ public class Body {
     public double getPosition(int j) {
         return positionInitial[j] + position[j];
     }
+
     public double[] getPosition() {
         double[] pos = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -73,6 +74,7 @@ public class Body {
     public double getVelocity(int j) {
         return velocitiesInitial[j] + velocities[j];
     }
+
     public double[] getVelocity() {
         double[] vel = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -87,5 +89,39 @@ public class Body {
             r_2 += Math.pow(this.getPosition(i) - body.getPosition(i), 2);
         }
         return Math.sqrt(r_2);
+    }
+
+    public double[] distanceVector(Body body) {
+        double[] vectorDistance = new double[3];
+        for (int i = 0; i < position.length; i++) {
+            vectorDistance[i] += body.getPosition(i) - this.getPosition(i);
+        }
+        return vectorDistance;
+    }
+
+    public double[] distanceVector(double[] skyPosition) {
+        double[] vectorDistance = new double[3];
+        for (int i = 0; i < position.length; i++) {
+            vectorDistance[i] = skyPosition[i] - this.positionInitial[i];
+        }
+        return vectorDistance;
+    }
+
+    public void ra_dec(Body body, boolean real) {
+        double ra, dec;
+        double distance = this.distance(body);
+        double time = distance / Constants.c;
+        double[] skyPosition = body.getPositionInitial();
+        double[] velocity = body.getVelocitiesInitial();
+        if (real) {
+            for (int j = 0; j < 3; j++) {
+                skyPosition[j] = skyPosition[j] - velocity[j] * time;
+            }
+        }
+        skyPosition = distanceVector(skyPosition);
+        double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2));
+        ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
+        dec = Math.asin(skyPosition[2] / h) * 180 / Math.PI;
+        System.out.println(body.getName() + " | " + ra + ": " + dec);
     }
 }

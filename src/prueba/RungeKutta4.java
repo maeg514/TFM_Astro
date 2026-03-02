@@ -177,20 +177,10 @@ public class RungeKutta4 {
     public void ra_dec() {
         //arctan(y/x)
         //arctan(z/h)
-        double[][] dist_times = new double[bodies.size() - 1][2];
-        double[][] ra_dec = new double[bodies.size() - 1][2];
         Body earth = bodies.get(3);
-        for (int i = 0; i < bodies.size() - 1; i++) {
-            Body bodyLoop = bodies.get(i);
-            if (!bodyLoop.equals(earth)) {
-                dist_times[i][0] = earth.distance(bodyLoop);
-                dist_times[i][1] = dist_times[i][0] / Constants.c;
-                double[] pos = bodyLoop.getPositionInitial();
-                double h = Math.sqrt(Math.pow(pos[0], 2) + Math.pow(pos[1], 2));
-                ra_dec[i][0] = Math.atan(pos[0] / pos[1]);
-                ra_dec[i][1] = Math.atan(pos[2] / h);
-            }
-            System.out.println(dist_times[i][1]);
+        for (Body skyObject: bodies){
+            if (skyObject.equals(earth)) continue;
+            earth.ra_dec(skyObject,true);
         }
     }
 
