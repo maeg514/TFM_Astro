@@ -59,6 +59,14 @@ public class Body {
         this.positionInitial = positionInitial;
     }
 
+    public void setVelocities(double[] velocities) {
+        this.velocities = velocities;
+    }
+
+    public void setPosition(double[] position) {
+        this.position = position;
+    }
+
     public double getPosition(int j) {
         return positionInitial[j] + position[j];
     }
@@ -93,8 +101,9 @@ public class Body {
 
     public double[] distanceVector(Body body) {
         double[] vectorDistance = new double[3];
+        double[] vectorBody = body.getPositionInitial();
         for (int i = 0; i < position.length; i++) {
-            vectorDistance[i] += body.getPosition(i) - this.getPosition(i);
+            vectorDistance[i] += vectorBody[i] - this.positionInitial[i];
         }
         return vectorDistance;
     }
@@ -105,6 +114,15 @@ public class Body {
             vectorDistance[i] = skyPosition[i] - this.positionInitial[i];
         }
         return vectorDistance;
+    }
+
+    public double[] relativeVelocityVector(Body body) {
+        double[] vectorVelocity = new double[3];
+        double[] vectorBody = body.getVelocitiesInitial();
+        for (int i = 0; i < position.length; i++) {
+            vectorVelocity[i] += vectorBody[i] - this.velocitiesInitial[i];
+        }
+        return vectorVelocity;
     }
 
     public void ra_dec(Body body, boolean real) {//printear distancias tambien

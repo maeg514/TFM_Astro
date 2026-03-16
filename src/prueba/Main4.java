@@ -10,7 +10,7 @@ void main() {
     //double jd = Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
     double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
     double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-    double integrationStep = 0.1;
+    double integrationStep = 0.01;
     System.out.println("Integration End Time should be: " + integrationEndTime2);
     rungeKutta.RK4(0, integrationEndTime2, integrationStep);
     long endTime = System.currentTimeMillis();

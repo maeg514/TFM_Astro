@@ -25,7 +25,9 @@ public class RungeKutta4 {
 
             if (bodyLoop.getName().equals("Sun")) {
                 relativisticAcceleration(body, bodyLoop, ac);
-                //if (body.getName().equals("Apophis")) apophisNGF(body,bodyLoop,ac);
+                if (body.getName().equals("Apophis")){
+                    apophisNGF(body,bodyLoop,ac);
+                }
             }
             if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
                 earthsFlatteningFactor(body, bodyLoop, ac);
@@ -52,19 +54,22 @@ public class RungeKutta4 {
                 double lastH = b - time;
                 if (lastH == 0) break;
                 h = lastH;
-            }//Comprobar si llega hasta el final del tiempo de integracion
+            }
 
             double[][][] k = new double[bodies.size()][coefRunge.length][6];
-            //double[][] dvel = new double[bodies.size()][3];
-            //double[][] dpos = new double[bodies.size()][3];
+
             for (int j = 0; j < coefPosicion.length; j++) {
                 if (j > 0) {
                     for (int l = 0; l < bodies.size(); l++) {
                         Body bodyLoop = bodies.get(l);
+                        double[] posBody = bodyLoop.getPosition();
+                        double[] velBody = bodyLoop.getVelocity();
                         for (int m = 0; m < 3; m++) {
-                            bodyLoop.position[m] = coefPosicion[j] * k[l][j - 1][m];
-                            bodyLoop.velocities[m] = coefPosicion[j] * k[l][j - 1][m + 3];
+                            posBody[m] = coefPosicion[j] * k[l][j - 1][m];
+                            velBody[m] = coefPosicion[j] * k[l][j - 1][m + 3];
                         }
+                        bodyLoop.setPosition(posBody);
+                        bodyLoop.setVelocities(velBody);
                     }
                 }
 
@@ -122,7 +127,8 @@ public class RungeKutta4 {
                 System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
             }
             ra_dec();
-            changesChecking();
+            vectorGeocentric();
+            //changesChecking();
         }
     }
 
@@ -199,6 +205,17 @@ public class RungeKutta4 {
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
             earth.ra_dec(skyObject, true);
+        }
+    }
+
+    public void vectorGeocentric() {
+        Body earth = bodies.get(3);
+        for (Body skyObject : bodies) {
+            if (skyObject.equals(earth)) continue;
+            double[] p = earth.distanceVector(skyObject);
+            double[] v = earth.relativeVelocityVector(skyObject);
+            System.out.println(skyObject.getName());
+            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
         }
     }
 
