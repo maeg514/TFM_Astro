@@ -1,6 +1,6 @@
-package prueba;
+package main.objectOriented;
 
-import static prueba.Constants.UA;
+import main.Constants;
 
 public class Body {
     private String name;
@@ -161,15 +161,15 @@ public class Body {
         // Obtain local apparent sidereal time
         double jd0 = Math.floor(jd_ut - 0.5) + 0.5; // previous midnight
         double t0 = (jd0 - Constants.J2000) / Constants.JULIAN_DAYS_PER_CENTURY; // centuries from previous midnight
-        double secs = (jd_ut - jd0) * Constants.SECONDS_PER_DAY;
+        double secs = (jd_ut - jd0) * main.Constants.SECONDS_PER_DAY;
         double gmst = (((((-6.2e-6 * t0) + 9.3104e-2) * t0) + 8640184.812866) * t0) + 24110.54841;
-        double msday = 1.0 + (((((-1.86e-5 * t0) + 0.186208) * t0) + 8640184.812866) / (Constants.SECONDS_PER_DAY *
-                Constants.JULIAN_DAYS_PER_CENTURY));
+        double msday = 1.0 + (((((-1.86e-5 * t0) + 0.186208) * t0) + 8640184.812866) / (main.Constants.SECONDS_PER_DAY *
+                main.Constants.JULIAN_DAYS_PER_CENTURY));
         gmst = (gmst + msday * secs) * 15.0 * Constants.ARCSEC_TO_RAD;
 
         // IAU 1994 resolution C7 added two terms (dependent on the mean ascending node of the lunar orbit omega)
         // to the equation of equinoxes, taking effect since 1997-02-27
-        double dt = (jd_ut + ttMinusUT / Constants.SECONDS_PER_DAY - Constants.J2000) / Constants.JULIAN_DAYS_PER_CENTURY;
+        double dt = (jd_ut + ttMinusUT / Constants.SECONDS_PER_DAY - Constants.J2000) / main.Constants.JULIAN_DAYS_PER_CENTURY;
         double omega = 125.04452 - 1934.136261 * dt + 0.0020708 * dt * dt + (dt * dt * dt) / 450000;
 
         double eps0 = 84381.448;
@@ -192,9 +192,9 @@ public class Body {
 
     public double[] vectorObserver(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
         double lst = localApparentSiderealTime(jd_ut, ttMinusUT, obsLon);
-        double geocLat = (obsLat - .1925 * Math.sin(2 * obsLat) * Constants.DEG_TO_RAD);
+        double geocLat = (obsLat - .1925 * Math.sin(2 * obsLat) * main.Constants.DEG_TO_RAD);
         double geocR = 1.0 - Math.pow(Math.sin(obsLat), 2) / 298.257;
-        double radiusAU = (geocR * Constants.EARTH_RADIUS + obsAlt * 0.001 / UA);
+        double radiusAU = (geocR * Constants.EARTH_RADIUS + obsAlt * 0.001 / Constants.UA);
         double cosLat = Math.cos(geocLat);
         double[] correction = new double[]{
                 radiusAU * cosLat * Math.cos(lst),

@@ -1,8 +1,13 @@
-package prueba;
+package main.efficiencyOriented;
+
+import main.Constants;
+import main.objectOriented.Body;
+import main.Utility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class RKController {
     List<Body> bodies = new ArrayList<>();
@@ -13,26 +18,29 @@ public class RKController {
         this.rungeKutta = new RK4(bodies);
     }
 
-    public void run(){
+    public void run() {
+
+        Scanner teclado = new Scanner(System.in);
 
         long currentTime = System.currentTimeMillis();
 
         double ttMinusUt = 69.185 / 86400.0;
         double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
-        //double jd = Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
+        //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
         double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
         double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-        double integrationStep = 0.1;
+        double integrationStep = 0.01;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
         rungeKutta.RK4(0, integrationEndTime2, integrationStep);
+        double[][][] resultado = rungeKutta.getPos_vel_Initial();
         long endTime = System.currentTimeMillis();
         double elapsed = (endTime - currentTime) * 0.001;
         System.out.println("Time: " + (float) elapsed);
 
-        double lon = -(3 + 42 / 60.0);
-        double lat = 40 + 26 / 60.0;
-        double alt = 0;
-        ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
+        System.out.println(Arrays.deepToString(resultado));
+
+        updateBodies(resultado);
+
 
         String approveChanges = "y";
         /*if (changesChecking()){
@@ -51,6 +59,11 @@ public class RKController {
             vectorGeocentric();
             //changesChecking();
         }
+
+        double lon = -(3 + 42 / 60.0);
+        double lat = 40 + 26 / 60.0;
+        double alt = 0;
+        ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
 
     }
 
@@ -129,7 +142,6 @@ public class RKController {
 
     }
 
-
     private void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
         Body mercury = new Body("Mercury", Constants.MASS_MERCURY, new double[]{-0.1300936053754522, -0.40059372164232543, -0.20048930201672596}, new double[]{0.021366395668016163, -0.004926299692875428, -0.004847433077772866});
@@ -160,5 +172,13 @@ public class RKController {
         bodies.add(moon);
         bodies.add(pluto);
         bodies.add(apophis);
+    }
+
+    private void updateBodies(double[][][] results) {
+        for (int i = 0; i < bodies.size(); i++) {
+            Body updateBody = bodies.get(i);
+            updateBody.setPositionInitial(results[i][0]);
+            updateBody.setVelocityInitial(results[i][1]);
+        }
     }
 }

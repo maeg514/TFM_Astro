@@ -1,4 +1,4 @@
-package prueba;
+package initialTest;
 
 public class RungeKuttaBase {
 
