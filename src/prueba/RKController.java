@@ -4,112 +4,35 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RungeKutta4 {
+public class RKController {
     List<Body> bodies = new ArrayList<>();
+    RK4 rungeKutta;
 
-    public RungeKutta4() {
+    public RKController() {
         addBodies();
+        this.rungeKutta = new RK4(bodies);
     }
 
-    public void funcionYPrima(Body body, double h) {
-        double[] ac = new double[3];
-        double[] posBody = body.getPosition();
-        for (Body bodyLoop : bodies) {
-            double distance = body.distance(bodyLoop);
-            double[] posBodyLoop = bodyLoop.getPosition();
+    public void run(){
 
-            if (bodyLoop.equals(body)) continue;
+        long currentTime = System.currentTimeMillis();
 
+        double ttMinusUt = 69.185 / 86400.0;
+        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
+        //double jd = Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
+        double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
+        double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
+        double integrationStep = 0.1;
+        System.out.println("Integration End Time should be: " + integrationEndTime2);
+        rungeKutta.RK4(0, integrationEndTime2, integrationStep);
+        long endTime = System.currentTimeMillis();
+        double elapsed = (endTime - currentTime) * 0.001;
+        System.out.println("Time: " + (float) elapsed);
 
-            if (bodyLoop.getName().equals("Sun")) {
-                relativisticAcceleration(body, bodyLoop, ac);
-                if (body.getName().equals("Apophis")){
-                    apophisNGF(body,bodyLoop,ac);
-                }
-            }
-            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
-                earthsFlatteningFactor(body, bodyLoop, ac);
-            }
-
-            double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(distance, 3);
-            for (int j = 0; j < 3; j++) {
-                ac[j] += GMr3 * (posBody[j] - posBodyLoop[j]);
-            }
-        }
-        body.setAcceleration(ac);
-    }
-
-    public void RK4(double a, double b, double h) {
-        double[] coefPosicion = new double[]{0, 0.5, 0.5, 1};
-        double[] coefRunge = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
-
-        int N = (int) ((b - a) / h);
-        System.out.println("el valor de h es: " + h);//Lanzar excepcion
-        double time = 0;
-        for (int i = 0; i < N + 1; i++) {
-            time = a + i * h;
-            if (i == N) {
-                double lastH = b - time;
-                if (lastH == 0) break;
-                h = lastH;
-            }
-
-            double[][][] k = new double[bodies.size()][coefRunge.length][6];
-
-            for (int j = 0; j < coefPosicion.length; j++) {
-                if (j > 0) {
-                    for (int l = 0; l < bodies.size(); l++) {
-                        Body bodyLoop = bodies.get(l);
-                        double[] posBody = bodyLoop.getPosition();
-                        double[] velBody = bodyLoop.getVelocity();
-                        for (int m = 0; m < 3; m++) {
-                            posBody[m] = coefPosicion[j] * k[l][j - 1][m];
-                            velBody[m] = coefPosicion[j] * k[l][j - 1][m + 3];
-                        }
-                        bodyLoop.setPosition(posBody);
-                        bodyLoop.setVelocity(velBody);
-                    }
-                }
-
-                for (int l = 0; l < bodies.size(); l++) {
-                    Body bodyLoop = bodies.get(l);
-                    funcionYPrima(bodyLoop, h);
-                }
-
-                for (int l = 0; l < bodies.size(); l++) {
-                    Body bodyLoop = bodies.get(l);
-                    for (int m = 0; m < 3; m++) {
-                        k[l][j][m + 3] = bodyLoop.getAcceleration()[m] * h;
-                        k[l][j][m] = bodyLoop.getVelocity(m) * h;
-                    }
-                }
-            }
-
-            for (int l = 0; l < bodies.size(); l++) {
-                Body bodyLoop = bodies.get(l);
-                double[] p = bodyLoop.getPositionInitial();
-                double[] v = bodyLoop.getVelocityInitial();
-                for (int m = 0; m < 3; m++) {
-                    double positionIncrement = 0;
-                    double velIncrement = 0;
-                    for (int j = 0; j < coefRunge.length; j++) {
-                        positionIncrement += coefRunge[j] * k[l][j][m];
-                        velIncrement += coefRunge[j] * k[l][j][m + 3];
-                    }
-                    p[m] += positionIncrement;
-                    v[m] += velIncrement;
-
-                    //bodyLoop.velocities[m] = bodyLoop.position[m] = 0; // Es mas rapido ?
-                }
-                bodyLoop.setPositionInitial(p);//por clarificar
-                bodyLoop.setVelocityInitial(v);
-                bodyLoop.position = new double[3];
-                bodyLoop.velocity = new double[3];
-            }
-            time += h;
-        }
-
-        System.out.println("Time (integration end): " + time);
+        double lon = -(3 + 42 / 60.0);
+        double lat = 40 + 26 / 60.0;
+        double alt = 0;
+        ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
 
         String approveChanges = "y";
         /*if (changesChecking()){
@@ -117,7 +40,7 @@ public class RungeKutta4 {
             approveChanges = teclado.next();
         }*/
 
-        if (approveChanges.equals("y")){
+        if (approveChanges.equals("y")) {
             for (Body bodyLoop : bodies) {
                 double[] p = bodyLoop.getPositionInitial();
                 double[] v = bodyLoop.getVelocityInitial();
@@ -128,72 +51,7 @@ public class RungeKutta4 {
             vectorGeocentric();
             //changesChecking();
         }
-    }
 
-    private void relativisticAcceleration(Body body, Body bodyLoop, double[] ac) {
-        double pv = 0, v2 = 0;
-        double[] posBody = body.getPosition();
-        double[] velBody = body.getVelocity();
-        double[] posBodyLoop = bodyLoop.getPosition();
-        double[] velBodyLoop = bodyLoop.getVelocity();
-        double d = body.distance(bodyLoop);
-        for (int j = 0; j < 3; j++) {
-            double dp = posBody[j] - posBodyLoop[j];
-            double dv = velBody[j] - velBodyLoop[j];
-            v2 += dv * dv;
-            pv += dp * dv;
-        }
-        for (int j = 0; j < 3; j++) {
-            double a = (4 * Constants.G * (posBody[j] - posBodyLoop[j]) / Math.pow(d, 4));
-            double b = (v2 * (posBody[j] - posBodyLoop[j]) / Math.pow(d, 3));
-            double c = (4 * pv / Math.pow(d, 3)) * (velBody[j] - velBodyLoop[j]);
-            ac[j] += Constants.mu * (a - b + c);
-        }
-    }
-
-    private void earthsFlatteningFactor(Body body, Body bodyLoop, double[] ac) {
-        double[] vectorAux = new double[3];
-        double[] posBody = body.getPosition();
-        double[] posBodyLoop = bodyLoop.getPosition();
-        for (int i = 0; i < 3; i++) {
-            vectorAux[i] = posBodyLoop[i] - posBody[i];
-        }
-        double factor = -Constants.J2 / Math.pow(body.distance(bodyLoop), 7);
-        ac[0] += factor * vectorAux[0] * (6 * Math.pow(vectorAux[2], 2) - 1.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
-        ac[1] += factor * vectorAux[1] * (6 * Math.pow(vectorAux[2], 2) - 1.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
-        ac[2] += factor * vectorAux[2] * (3 * Math.pow(vectorAux[2], 2) - 4.5 * (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2)));
-    }
-
-    // Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.
-    private void apophisNGF(Body body, Body bodyLoop, double[] ac) {
-        double[] posAux = new double[3];
-        double[] velAux = new double[3];
-        double[] posBody = body.getPosition();
-        double[] posBodyLoop = bodyLoop.getPosition();
-        double[] velBody = body.getVelocity();
-        double[] velBodyLoop = bodyLoop.getVelocity();
-        double pv = 0;
-        for (int i = 0; i < 3; i++) {
-            posAux[i] = posBodyLoop[i] - posBody[i];
-            velAux[i] = velBodyLoop[i] - velBody[i];
-            pv += posAux[i] * velAux[i];
-        }
-
-        // Within-orbital-plane transverse vector components
-        double r = body.distance(bodyLoop);
-        double r2 = r * r;
-        double tx = r2 * velAux[0] - pv * posAux[0];
-        double ty = r2 * velAux[1] - pv * posAux[1];
-        double tz = r2 * velAux[2] - pv * posAux[2];
-
-        // Multiplication factors. NGF (A) values are read in AU/s^2. a3 = 0 for Apophis
-        double a1 = 4.999999873689E-13 / r;
-        double a2 = -2.901766720242E-14 / Math.sqrt(tx * tx + ty * ty + tz * tz);
-
-        // X, Y and Z components of non-gravitational acceleration
-        ac[0] -= (a1 * posAux[0] + a2 * tx) / r2;//Corregido esto, estaba mal el signo
-        ac[1] -= (a1 * posAux[1] + a2 * ty) / r2;
-        ac[2] -= (a1 * posAux[2] + a2 * tz) / r2;
     }
 
     public void ra_dec() {//escoger body, astrometric
@@ -206,7 +64,7 @@ public class RungeKutta4 {
         }
     }
 
-    public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt){
+    public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
         obsLon *= Constants.DEG_TO_RAD;
         obsLat *= Constants.DEG_TO_RAD;
 
@@ -270,6 +128,7 @@ public class RungeKutta4 {
     private void saveResult() {
 
     }
+
 
     private void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});

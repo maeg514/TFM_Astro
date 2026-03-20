@@ -2,25 +2,8 @@ import prueba.*;
 
 
 void main() {
-    RungeKutta4 rungeKutta = new RungeKutta4();
-    long currentTime = System.currentTimeMillis();
-
-    double ttMinusUt = 69.185 / 86400.0;
-    double jd = Constants.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
-    //double jd = Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
-    double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
-    double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-    double integrationStep = 0.1;
-    System.out.println("Integration End Time should be: " + integrationEndTime2);
-    rungeKutta.RK4(0, integrationEndTime2, integrationStep);
-    long endTime = System.currentTimeMillis();
-    double elapsed = (endTime - currentTime) * 0.001;
-    System.out.println("Time: " + (float) elapsed);
-
-    double lon = -(3 + 42 / 60.0);
-    double lat = 40 + 26 / 60.0;
-    double alt = 0;
-    rungeKutta.ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
+    RKController rkController = new RKController();
+    rkController.run();
 }
 //Terminar cambios tareas
 //Printear con un poco más de sentido las cosas
@@ -34,3 +17,18 @@ Dentro de los parámetros a elegir tenemos:
 -Gráficos?
 
 */
+
+/*
+
+- Más flexibilidad a la hora de establecer el final de la integración. Paso de TT a UTC con el día Juliano. Seguir usando 0 para el inicio *****
+	- Tal vez separar el método RK4 en varios para más claridad
+	- Cuidado con la última iteración si se establece un punto final que requiera de un número de pasos de integración no entero ***************
+	- Implementar correcciones relativistas, de achatamiento terrestre, y fuerzas no gravitatorias en Apophis **********************************
+	- Revisión del código, mejorar organización, e ideas para optimizarlo por velocidad
+	- Cálculo de efemérides desde un observador, en principio en el centro de la Tierra. Usar precesión de Laskar
+	- Pruebas de precisión con el RK4 para Apophis, comparación con Horizons
+	- Implementación del RK de orden 5: comparación con Horizons durante miles de años usando TDB
+	- Trayectoria de Apophis y 2024 YR4 desde un observador en Madrid. Comparación con Horizons. Qué ocurre si se añaden asteroides con masa ?
+	- Posibles ideas para probar la precisión del código - gráficos
+
+ */

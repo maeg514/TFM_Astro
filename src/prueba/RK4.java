@@ -1,42 +1,20 @@
 package prueba;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class RK4 {
     List<Body> bodies;
+    double [][][] pos_vel_Initial;
+    double [][][] delta_PosVel;
+    double [][][] pos_vel_Added;
 
     public RK4(List<Body> bodies) {
         this.bodies = bodies;
+        this.pos_vel_Initial = bodiesIntoArray(bodies);
+        this.delta_PosVel = new double[bodies.size()][2][3];
+        this.pos_vel_Added = new double[bodies.size()][2][3];
     }
 
-    public void funcionYPrima(Body body, double h) {
-        double[] ac = new double[3];
-        double[] posBody = body.getPosition();
-        for (Body bodyLoop : bodies) {
-            double distance = body.distance(bodyLoop);
-            double[] posBodyLoop = bodyLoop.getPosition();
-
-            if (bodyLoop.equals(body)) continue;
-
-
-            if (bodyLoop.getName().equals("Sun")) {
-                relativisticAcceleration(body, bodyLoop, ac);
-                if (body.getName().equals("Apophis")) {
-                    apophisNGF(body, bodyLoop, ac);
-                }
-            }
-            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
-                earthsFlatteningFactor(body, bodyLoop, ac);
-            }
-
-            double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(distance, 3);
-            for (int j = 0; j < 3; j++) {
-                ac[j] += GMr3 * (posBody[j] - posBodyLoop[j]);
-            }
-        }
-        body.setAceleration(ac);
-    }
 
     public void RK4(double a, double b, double h) {
         double[] coefPosicion = new double[]{0, 0.5, 0.5, 1};
@@ -58,28 +36,25 @@ public class RK4 {
             for (int j = 0; j < coefPosicion.length; j++) {
                 if (j > 0) {
                     for (int l = 0; l < bodies.size(); l++) {
-                        Body bodyLoop = bodies.get(l);
-                        double[] posBody = bodyLoop.getPosition();
-                        double[] velBody = bodyLoop.getVelocity();
                         for (int m = 0; m < 3; m++) {
-                            posBody[m] = coefPosicion[j] * k[l][j - 1][m];
-                            velBody[m] = coefPosicion[j] * k[l][j - 1][m + 3];
+                            delta_PosVel[l][0][m] = coefPosicion[j] * k[l][j - 1][m];
+                            delta_PosVel[l][1][m] = coefPosicion[j] * k[l][j - 1][m + 3];
+
+                            pos_vel_acc[l][0][m] += delta_PosVel[l][0][m];
+                            pos_vel_acc[l][1][m] += delta_PosVel[l][1][m];
                         }
-                        bodyLoop.setPosition(posBody);
-                        bodyLoop.setVelocities(velBody);
+
                     }
                 }
 
                 for (int l = 0; l < bodies.size(); l++) {
-                    Body bodyLoop = bodies.get(l);
-                    funcionYPrima(bodyLoop, h);
+                    funcionYPrima(l, h);
                 }
 
                 for (int l = 0; l < bodies.size(); l++) {
-                    Body bodyLoop = bodies.get(l);
                     for (int m = 0; m < 3; m++) {
-                        k[l][j][m + 3] = bodyLoop.getAceleration()[m] * h;
-                        k[l][j][m] = bodyLoop.getVelocity(m) * h;
+                        k[l][j][m + 3] = pos_vel_acc[l][2][m] * h;
+                        k[l][j][m] = pos_vel_acc[l][2][m] * h;
                     }
                 }
             }
@@ -87,7 +62,7 @@ public class RK4 {
             for (int l = 0; l < bodies.size(); l++) {
                 Body bodyLoop = bodies.get(l);
                 double[] p = bodyLoop.getPositionInitial();
-                double[] v = bodyLoop.getVelocitiesInitial();
+                double[] v = bodyLoop.getVelocityInitial();
                 for (int m = 0; m < 3; m++) {
                     double positionIncrement = 0;
                     double velIncrement = 0;
@@ -101,32 +76,45 @@ public class RK4 {
                     //bodyLoop.velocities[m] = bodyLoop.position[m] = 0; // Es mas rapido ?
                 }
                 bodyLoop.setPositionInitial(p);//por clarificar
-                bodyLoop.setVelocitiesInitial(v);
+                bodyLoop.setVelocityInitial(v);
                 bodyLoop.position = new double[3];
-                bodyLoop.velocities = new double[3];
+                bodyLoop.velocity = new double[3];
             }
             time += h;
         }
 
         System.out.println("Time (integration end): " + time);
 
-        String approveChanges = "y";
-        /*if (changesChecking()){
-            System.out.println("¿Desea actualizar los valores de los cuerpos? (y/n)");
-            approveChanges = teclado.next();
-        }*/
+    }
 
-        if (approveChanges.equals("y")) {
-            for (Body bodyLoop : bodies) {
-                double[] p = bodyLoop.getPositionInitial();
-                double[] v = bodyLoop.getVelocitiesInitial();
-                System.out.println(bodyLoop.getName());
-                System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
+    public void funcionYPrima(int l, double h) {
+        double[] ac = new double[3];
+        Body body = bodies.get(l);
+        double[] posBody = pos_vel_acc[l][0];
+        for (int b = 0; b < bodies.size(); b++) {
+            Body bodyLoop = bodies.get(l);
+            double distance = body.distance(bodyLoop);
+            double[] posBodyLoop = pos_vel_acc[l][0];
+
+            if (bodyLoop.equals(body)) continue;
+
+
+            if (bodyLoop.getName().equals("Sun")) {
+                relativisticAcceleration(body, bodyLoop, ac);
+                if (body.getName().equals("Apophis")) {
+                    apophisNGF(body, bodyLoop, ac);
+                }
             }
-            ra_dec();
-            vectorGeocentric();
-            //changesChecking();
+            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
+                earthsFlatteningFactor(body, bodyLoop, ac);
+            }
+
+            double GMr3 = -Constants.G * bodyLoop.getMass() / Math.pow(distance, 3);
+            for (int j = 0; j < 3; j++) {
+                ac[j] += GMr3 * (posBody[j] - posBodyLoop[j]);
+            }
         }
+        body.setAcceleration(ac);
     }
 
     private void relativisticAcceleration(Body body, Body bodyLoop, double[] ac) {
@@ -195,79 +183,13 @@ public class RK4 {
         ac[2] -= (a1 * posAux[2] + a2 * tz) / r2;
     }
 
-    public void ra_dec() {//escoger body, astrometric
-        //arctan(y/x)
-        //arctan(z/h)
-        Body earth = bodies.get(3);
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            earth.ra_dec(skyObject, true, null);
-        }
-    }
-
-    public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
-        obsLon *= Constants.DEG_TO_RAD;
-        obsLat *= Constants.DEG_TO_RAD;
-
-        Body earth = bodies.get(3);
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
-            earth.ra_dec(skyObject, true, vectorObserver);
-        }
-    }
-
-    public void vectorGeocentric() {//geometric
-        Body earth = bodies.get(3);
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            double[] p = earth.distanceVector(skyObject);
-            double[] v = earth.relativeVelocityVector(skyObject);
-            System.out.println(skyObject.getName());
-            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
-        }
-    }
-
-    private boolean changesChecking() {
-        boolean change = false;
-        double[][] vectorChecking = {
-                {-0.049242309887471504, 0.074132509477252, 0.0330492542781804, -6.638840273079683E-6, 1.1333410836986347E-5, 5.020739495743468E-6},
-                {-0.1760739199818666, 0.32571526005188833, 0.18059095619818513, -0.03143059302208097, -0.010193391021771555, -0.0021899646768472115},
-                {0.5307088992946106, 0.4815037437874529, 0.17966823928803466, -0.012152513410775403, 0.014445939303657404, 0.00726875747899652},
-                {-0.9666535235112791, -0.29766690149825836, -0.12811318383017878, 0.006667698406407208, -0.014492822729155636, -0.006281995555942135},
-                {-1.6366682834390605, -0.28430391930889515, -0.08855073053025654, 0.0037495327509574727, -0.011242415373455425, -0.005258152056345891},
-                {-5.092976239731671, -1.868012145731055, -0.6766246251589241, 0.0027644573490153133, -0.006065485255554673, -0.0026671084712878933},
-                {6.620173515580458, 5.99993594982585, 2.1933532843135004, -0.004135579566238353, 0.003682250293646825, 0.001699081484892807},
-                {5.481440243214165, 17.010830890611494, 7.372570789687953, -0.003801828505975123, 8.534638617653026E-4, 4.2754997070165826E-4},
-                {29.491198701523263, 4.311806999682784, 1.0320551034608143, -4.7644648041138786E-4, 0.0028954220548403336, 0.0011971054423927895},
-                {-0.9641781702968775, -0.29675226035312885, -0.12746905047546234, 0.006437865411518236, -0.014017476469827213, -0.0060915920244318},
-                {22.342215393477137, -24.52871026222943, -14.39150456821061, 0.0025554516150016306, 0.0014851518811703145, -3.071722236487479E-4},
-                {-0.9668011993134284, -0.2974885677327149, -0.127997618542421, 0.010258531574114051, -0.013057629302864146, -0.004487815348114064},
-        };
-
-        double[][] differences = new double[bodies.size()][6];
-
+    private double[][][] bodiesIntoArray(List<Body> bodies){
+        double[][][] pv = new double[bodies.size()][2][3];
         for (int i = 0; i < bodies.size(); i++) {
-            Body bodyCheck = bodies.get(i);
-            double[] posCheck = bodyCheck.getPositionInitial();
-            double[] velCheck = bodyCheck.getVelocitiesInitial();
-            for (int j = 0; j < 3; j++) {
-                differences[i][j] = posCheck[j] - vectorChecking[i][j];
-                differences[i][j + 3] = velCheck[j] - vectorChecking[i][j + 3];
-                if (!change) {
-                    if (differences[i][j] != 0 || differences[i][j + 3] != 0) change = true;
-                }
-            }
+            pv[i][0] = bodies.get(i).getPositionInitial().clone();
+            pv[i][1] = bodies.get(i).getVelocityInitial().clone();
         }
-
-        for (double[] fila : differences) {
-            System.out.println(Arrays.toString(fila));
-        }
-        return change;
-    }
-
-    private void saveResult() {
-
+        return pv;
     }
 
 }

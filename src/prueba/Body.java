@@ -1,26 +1,24 @@
 package prueba;
 
-import jdk.jshell.execution.Util;
-
 import static prueba.Constants.UA;
 
 public class Body {
     private String name;
     private double mass;
     private double[] positionInitial;
-    private double[] velocitiesInitial;
+    private double[] velocityInitial;
     private double[] acceleration;
     public double[] position;
-    public double[] velocities;
+    public double[] velocity;
 
-    public Body(String name, double mass, double[] positionInitial, double[] velocitiesInitial) {
+    public Body(String name, double mass, double[] positionInitial, double[] velocityInitial) {
         this.name = name;
         this.mass = mass;
         this.positionInitial = positionInitial;
-        this.velocitiesInitial = velocitiesInitial;
+        this.velocityInitial = velocityInitial;
         this.acceleration = new double[3];
         this.position = new double[3];
-        this.velocities = new double[3];
+        this.velocity = new double[3];
     }
 
     public String getName() {
@@ -31,20 +29,20 @@ public class Body {
         return mass;
     }
 
-    public double[] getAceleration() {
+    public double[] getAcceleration() {
         return acceleration;
     }
 
-    public void setAceleration(double[] aceleration) {
-        this.acceleration = aceleration;
+    public void setAcceleration(double[] acceleration) {
+        this.acceleration = acceleration;
     }
 
     public double[] getPositionInitial() {
         return positionInitial;
     }
 
-    public double[] getVelocitiesInitial() {
-        return velocitiesInitial;
+    public double[] getVelocityInitial() {
+        return velocityInitial;
     }
 
     public void setName(String name) {
@@ -55,16 +53,16 @@ public class Body {
         this.mass = mass;
     }
 
-    public void setVelocitiesInitial(double[] velocitiesInitial) {
-        this.velocitiesInitial = velocitiesInitial;
+    public void setVelocityInitial(double[] velocityInitial) {
+        this.velocityInitial = velocityInitial;
     }
 
     public void setPositionInitial(double[] positionInitial) {
         this.positionInitial = positionInitial;
     }
 
-    public void setVelocities(double[] velocities) {
-        this.velocities = velocities;
+    public void setVelocity(double[] velocity) {
+        this.velocity = velocity;
     }
 
     public void setPosition(double[] position) {
@@ -84,13 +82,13 @@ public class Body {
     }
 
     public double getVelocity(int j) {
-        return velocitiesInitial[j] + velocities[j];
+        return velocityInitial[j] + velocity[j];
     }
 
     public double[] getVelocity() {
         double[] vel = new double[3];
         for (int i = 0; i < 3; i++) {
-            vel[i] = velocitiesInitial[i] + velocities[i];
+            vel[i] = velocityInitial[i] + velocity[i];
         }
         return vel;
     }
@@ -129,9 +127,9 @@ public class Body {
 
     public double[] relativeVelocityVector(Body body) {
         double[] vectorVelocity = new double[3];
-        double[] vectorBody = body.getVelocitiesInitial();
+        double[] vectorBody = body.getVelocityInitial();
         for (int i = 0; i < position.length; i++) {
-            vectorVelocity[i] += vectorBody[i] - this.velocitiesInitial[i];
+            vectorVelocity[i] += vectorBody[i] - this.velocityInitial[i];
         }
         return vectorVelocity;
     }
@@ -139,7 +137,7 @@ public class Body {
     public void ra_dec(Body body, boolean real, double[] obsPos) {//printear distancias tambien
         double ra, dec;
         double[] skyPosition = body.getPositionInitial().clone();
-        double[] velocity = body.getVelocitiesInitial();
+        double[] velocity = body.getVelocityInitial();
         if (obsPos != null) {
             for (int i = 0; i < skyPosition.length; i++) {
                 skyPosition[i] -= obsPos[i];
