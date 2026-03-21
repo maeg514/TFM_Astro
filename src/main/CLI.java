@@ -1,4 +1,4 @@
-package prueba;
+package main;
 
 public class CLI {
 

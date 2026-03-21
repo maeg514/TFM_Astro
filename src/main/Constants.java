@@ -1,4 +1,4 @@
-package prueba;
+package main;
 
 public class Constants {
     public static final double G = 2.9591220828411956E-04;

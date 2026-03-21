@@ -1,4 +1,4 @@
-package prueba;
+package main.objectOriented;
 
 public class MainPruebas {
     public static void main(String[] args) {
@@ -6,11 +6,11 @@ public class MainPruebas {
         long currentTime = System.currentTimeMillis();
 
         double ttMinusUt = 69.185 / 86400.0;
-        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
-        //double jd = Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
+        double jd = main.Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
+        //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
         double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
         double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-        double integrationStep = 0.01;
+        double integrationStep = 0.1;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
 
         rungeKutta.RK4(0, integrationEndTime2, integrationStep);
