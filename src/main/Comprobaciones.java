@@ -9,11 +9,26 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class Comprobaciones {
-    static void main() throws IOException, URISyntaxException {
-        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTOR%27&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
-        System.out.println(query(url));
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
+                "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        String url2 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
+                "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        //String resultado = query(url);
+        //System.out.println(resultado);
+        double[][] coefPosicion = new double[][]{{1 / 3.}, {-1 / 3., 1}, {1, -1, 1}};
+        double[][] aja = new double[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                aja[i][j] += 2;
+            }
+        }
+        System.out.println(Arrays.deepToString(aja));
     }
 
     /**
@@ -45,10 +60,31 @@ public class Comprobaciones {
 
         StringBuilder output = new StringBuilder(1000);
         while ((inputLine = in.readLine()) != null) {
-            output.append(inputLine + "\n");
+            output.append(inputLine).append("\n");
             //output.append(inputLine + Util.getLineSeparator());
         }
         in.close();
         return output.toString();
     }
+
+    // X = -1.455656900545057E-04 Y = 1.751927427817715E-04 Z = 1.141817805459706E-04    JPL
+    // X = -1.4500160886044E-4    Y = 1.7578322869904461E-4 Z = 1.1475726733700675E-4    POO
+    // X = -1.4649900667473847E-4 Y = 1.7717332974365174E-4 Z = 1.1519435237661302E-4    EOO
+
+    // Apophis | 129.72265        :  26.62301              JPL
+    // Apophis | 129.5186956031062:  26.728963197811982    POO
+    // Apophis | 129.58611425722697: 26.612975937764222    EOO
+
+    // Pluto(Sun):
+    // X = 22.39145277362250  Y = -24.60284945484394 Z = -14.42456582921362   JPL
+    // X = 22.342215393477137 Y = -24.52871026222943 Z = -14.39150456821061   POO
+    // X = 22.342215393477137 Y = -24.52871026222943 Z = -14.39150456821061   EOO
+
+    // Apohphis(Sun):
+    // X = -0.9175567641209890 Y = -0.3716242567082039 Z = -0.1610482740289097    JPL
+    // X = -0.9667985251201395 Y = -0.2974911182695593 Z = -0.12799842656284177   POO
+    // X = -0.9668000225179538 Y = -0.2974897281685147 Z = -0.12799798947780217   EOO
+
+
+
 }

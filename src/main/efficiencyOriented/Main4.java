@@ -1,10 +1,13 @@
-import main.efficiencyOriented.RKController;
+package main.efficiencyOriented;
 
 
-void main() {
-    RKController rkController = new RKController();
-    rkController.run();
+public class Main4{
+     public static void main(String[] args) {
+        RKController rkController = new RKController();
+        rkController.run();
+    }
 }
+
 //Terminar cambios tareas
 //Printear con un poco más de sentido las cosas
 //Implementar el JUnit para los test (No se si esto puede ir de la mano de lo que tienen Horizons)

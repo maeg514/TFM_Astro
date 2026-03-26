@@ -14,13 +14,15 @@ public class MainPruebas {
         System.out.println("Integration End Time should be: " + integrationEndTime2);
 
         rungeKutta.RK4(0, integrationEndTime2, integrationStep);
-        long endTime = System.currentTimeMillis();
-        double elapsed = (endTime - currentTime) * 0.001;
-        System.out.println("Time: " + (float) elapsed);
+
 
         double lon = -(3 + 42 / 60.0);
         double lat = 40 + 26 / 60.0;
         double alt = 0;
         rungeKutta.ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
+
+        long endTime = System.currentTimeMillis();
+        double elapsed = (endTime - currentTime) * 0.001;
+        System.out.println("Time: " + (float) elapsed);
     }
 }

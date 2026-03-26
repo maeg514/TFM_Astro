@@ -3,17 +3,16 @@ package main.efficiencyOriented;
 import main.Constants;
 import main.objectOriented.Body;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class RK4 {
-    static final int RK_ORDER = 4;
+public class RK5 {
+    static final int RK_ORDER = 5;
     List<Body> bodies;
     final int NUMBER_OF_BODIES;
     double[][] pos_vel_Initial;
     double[][][] pos_vel_acc_Integration;
 
-    public RK4(List<Body> bodies) {
+    public RK5(List<Body> bodies) {
         this.bodies = bodies;
         this.NUMBER_OF_BODIES = bodies.size();
         this.pos_vel_Initial = bodiesIntoArray(bodies);
@@ -21,99 +20,10 @@ public class RK4 {
     }
 
 
-    public void RK4(double a, double b, double h) {
-        double[] coefPosicion = new double[]{0, 0.5, 0.5, 1}; // API Matriz
-        double[] coefRunge = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
-
-
-        int N = (int) ((b - a) / h);
-        System.out.println("el valor de h es: " + h);//Lanzar excepcion
-        double time = 0;
-        for (int i = 0; i < N + 1; i++) {
-
-
-            time = a + i * h;
-            if (i == N) {
-                double lastH = b - time;
-                if (lastH == 0) break;
-                h = lastH;
-            }
-
-            double[][][] k = new double[bodies.size()][coefRunge.length][6];
-            double[][][] delta_PosVel = new double[NUMBER_OF_BODIES][2][3];
-
-            for (int j = 0; j < RK_ORDER; j++) {
-
-                for (int l = 0; l < bodies.size(); l++) {
-                    for (int m = 0; m < 3; m++) {
-                        if (j > 0) {
-                            delta_PosVel[l][0][m] = coefPosicion[j] * k[l][j - 1][m];
-                            delta_PosVel[l][1][m] = coefPosicion[j] * k[l][j - 1][m + 3];
-                        } else {
-                            delta_PosVel[l][0][m] = 0;
-                            delta_PosVel[l][1][m] = 0;
-                        }
-
-                        pos_vel_acc_Integration[l][0][m] = pos_vel_Initial[l][m] + delta_PosVel[l][0][m];
-                        pos_vel_acc_Integration[l][1][m] = pos_vel_Initial[l][m + 3] + delta_PosVel[l][1][m];
-                    }
-                    //System.out.println(Arrays.toString(delta_PosVel[l][0]));
-
-                }
-
-
-                for (int l = 0; l < bodies.size(); l++) {
-                    funcionYPrima(l, h);
-                }
-
-                for (int l = 0; l < bodies.size(); l++) {
-                    for (int m = 0; m < 3; m++) {
-                        k[l][j][m + 3] = pos_vel_acc_Integration[l][2][m] * h;
-                        k[l][j][m] = pos_vel_acc_Integration[l][1][m] * h;
-                        //System.out.println(Arrays.toString(pos_vel_acc_Integration[l][2]) + " a ");
-                        //System.out.println(Arrays.toString(pos_vel_acc_Integration[l][1]) + "v ");
-
-                    }
-                    //System.out.println(Arrays.toString(k[l][j]));
-                }
-
-                delta_PosVel = new double[NUMBER_OF_BODIES][2][3];
-
-            }
-
-
-            for (int l = 0; l < bodies.size(); l++) {
-                for (int m = 0; m < 3; m++) {
-                    double positionIncrement = 0;
-                    double velIncrement = 0;
-                    for (int j = 0; j < coefRunge.length; j++) {
-                        positionIncrement += coefRunge[j] * k[l][j][m];
-                        velIncrement += coefRunge[j] * k[l][j][m + 3];
-                        //System.out.println(positionIncrement + " p " + coefRunge[j] + " / " + k[l][j][m]);
-                        //System.out.println(velIncrement + "v " + k[l][j][m + 3]);
-                    }
-                    pos_vel_Initial[l][m] += positionIncrement;
-                    pos_vel_Initial[l][m + 3] += velIncrement;
-
-                }
-            }
-
-
-            time += h;
-
-
-        }
-
-        System.out.println("Time (integration end): " + time);
-
-    }
-
-
-    public void RK4_v2(double a, double b, double h) {
+    public void RK(double a, double b, double h) {
         double[][] coefPosicion = new double[][]{{1 / 3.}, {-1 / 3., 1}, {1, -1, 1}}; // API Matriz
         double[] coefRunge = new double[]{1 / 8., 3 / 8., 3 / 8., 1 / 8.};
-        //double[][] coefPosicion = new double[][]{{1 / 2.}, {0, 1 / 2.}, {0, 0, 1}}; // API Matriz
-        //double[] coefRunge = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
+
 
 
         int N = (int) ((b - a) / h);
@@ -327,3 +237,4 @@ public class RK4 {
         return pos_vel_Initial;
     }
 }
+

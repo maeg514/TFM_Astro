@@ -29,15 +29,17 @@ public class RKController {
         //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
         double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
         double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-        double integrationStep = 0.01;
+        double integrationEndTime3 = 0.2;
+        double integrationStep2 = 0.1;
+        double integrationStep = 1.0;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
-        rungeKutta.RK4(0, integrationEndTime2, integrationStep);
-        double[][][] resultado = rungeKutta.getPos_vel_Initial();
-        long endTime = System.currentTimeMillis();
-        double elapsed = (endTime - currentTime) * 0.001;
-        System.out.println("Time: " + (float) elapsed);
+        //rungeKutta.RK4(0, integrationEndTime2, integrationStep2);
+        System.out.println("CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
+        double[][] resultado = rungeKutta.getPos_vel_Initial();
 
-        System.out.println(Arrays.deepToString(resultado));
+
+        //System.out.println(Arrays.deepToString(resultado));
 
         updateBodies(resultado);
 
@@ -64,6 +66,11 @@ public class RKController {
         double lat = 40 + 26 / 60.0;
         double alt = 0;
         ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
+
+
+        long endTime = System.currentTimeMillis();
+        double elapsed = (endTime - currentTime) * 0.001;
+        System.out.println("Time: " + (float) elapsed);
 
     }
 
@@ -174,11 +181,18 @@ public class RKController {
         bodies.add(apophis);
     }
 
-    private void updateBodies(double[][][] results) {
+    private void updateBodies(double[][] results) {
         for (int i = 0; i < bodies.size(); i++) {
             Body updateBody = bodies.get(i);
-            updateBody.setPositionInitial(results[i][0]);
-            updateBody.setVelocityInitial(results[i][1]);
+            double[] pos = new double[3];
+            double[] vel = new double[3];
+
+            for (int j = 0; j < 3; j++) {
+                pos[j] = results[i][j];
+                vel[j] = results[i][j+3];
+            }
+            updateBody.setPositionInitial(pos);
+            updateBody.setVelocityInitial(vel);
         }
     }
 }
