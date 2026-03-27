@@ -2,6 +2,8 @@ package main.objectOriented;
 
 import main.Constants;
 
+import java.util.Arrays;
+
 public class Body {
     private String name;
     private double mass;
@@ -137,6 +139,7 @@ public class Body {
     public void ra_dec(Body body, boolean real, double[] obsPos) {//printear distancias tambien
         double ra, dec;
         double[] skyPosition = body.getPositionInitial().clone();
+        skyPosition = distanceVector(skyPosition);
         double[] velocity = body.getVelocityInitial();
         if (obsPos != null) {
             for (int i = 0; i < skyPosition.length; i++) {
@@ -144,20 +147,19 @@ public class Body {
             }
         }
         if (real) {
-            double distance = this.distance(skyPosition);
+            double distance = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2) + Math.pow(skyPosition[2], 2));
             double time = distance / Constants.c;
             for (int j = 0; j < 3; j++) {
                 skyPosition[j] = skyPosition[j] - velocity[j] * time;
             }
         }
-        skyPosition = distanceVector(skyPosition);
         double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2)); //Math.hypot
         ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
         dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
         System.out.println(body.getName() + " | " + ra + ": " + dec);
     }
 
-    public static double localApparentSiderealTime(double jd_ut, double ttMinusUT, double obsLon) {
+    public double localApparentSiderealTime(double jd_ut, double ttMinusUT, double obsLon) {
         // Obtain local apparent sidereal time
         double jd0 = Math.floor(jd_ut - 0.5) + 0.5; // previous midnight
         double t0 = (jd0 - Constants.J2000) / Constants.JULIAN_DAYS_PER_CENTURY; // centuries from previous midnight
@@ -170,7 +172,7 @@ public class Body {
         // IAU 1994 resolution C7 added two terms (dependent on the mean ascending node of the lunar orbit omega)
         // to the equation of equinoxes, taking effect since 1997-02-27
         double dt = (jd_ut + ttMinusUT / Constants.SECONDS_PER_DAY - Constants.J2000) / main.Constants.JULIAN_DAYS_PER_CENTURY;
-        double omega = 125.04452 - 1934.136261 * dt + 0.0020708 * dt * dt + (dt * dt * dt) / 450000;
+        double omega = (125.04452 - 1934.136261 * dt + 0.0020708 * dt * dt + (dt * dt * dt) / 450000) * Constants.DEG_TO_RAD;
 
         double eps0 = 84381.448;
         double[] pol = {-468093., -155., 199925., -5138., -24967., -3905., 712., 2787., 579., 245.};
@@ -180,7 +182,7 @@ public class Body {
         }
         meanObliquity = (meanObliquity + eps0) * Constants.ARCSEC_TO_RAD;
 
-        double nutLon = 0;
+        double nutLon = nutation(jd_ut, ttMinusUT)[0];
         double last = (
                 gmst + obsLon + nutLon * Math.cos(meanObliquity)
                         + 0.00264 * Math.sin(omega) * Constants.ARCSEC_TO_RAD
@@ -200,6 +202,51 @@ public class Body {
                 radiusAU * cosLat * Math.cos(lst),
                 radiusAU * cosLat * Math.sin(lst),
                 radiusAU * Math.sin(geocLat)};
+        System.out.println(Arrays.toString(correction));
         return correction;
+    }
+
+    /**
+     * Computes nutation in longitude and obliquity
+     * @param jd Julian day in UT
+     * @return Nutation angles in radians
+     */
+    public double[] nutation(double jd, double ttMinusUT) {
+        double t = (jd + ttMinusUT / Constants.SECONDS_PER_DAY - Constants.J2000) / main.Constants.JULIAN_DAYS_PER_CENTURY;
+
+        // Mean elongation of Moon
+        double D = (297.85036 + 445267.111480 * t - 0.0019142 * t * t + t *
+                t * t / 189474.) * Constants.DEG_TO_RAD;
+        // Mean anomaly of Sun (Earth)
+        double M = (357.52772 + 35999.050340 * t - 0.0001603 * t * t - t *
+                t * t / 300000.) * Constants.DEG_TO_RAD;
+        // Mean anomaly of Moon
+        double Mp = (134.96298 + 477198.867398 * t + 0.0086972 * t * t + t
+                * t * t / 56250.) * Constants.DEG_TO_RAD;
+        // Moon's argument of latitude
+        double F = (93.27191 + 483202.017538 * t - 0.0036825 * t * t + t *
+                t * t / 327270.) * Constants.DEG_TO_RAD;
+        // Mean longitude of the ascending node of the Moon
+        double OM = (125.04452 - 1934.136261 * t + 0.0020708 * t * t + t *
+                t * t / 450000.) * Constants.DEG_TO_RAD;
+
+        // Compute approximate nutation (see Meeus, page 133, terms up to 0.02"). Accuracy better than 0.08", 0.05" respect IAU1980 nutation
+        double a2 = 2.0 * (F + OM - D), a3 = 2.0 * (F + OM);
+        double nutLon = (-(17.1996 + 0.01742 * t) * Math.sin(OM) - (1.3187
+                + 0.00016 * t) * Math.sin(a2) - (.2274 - 0.00002 * t) * Math.sin(a3)) +
+                (0.2062 + 0.00002 * t) * Math.sin(2 * OM) + (0.1426 - 0.00034 *
+                t) * Math.sin(M) + (0.0712 + 0.00001 * t) * Math.sin(Mp) +
+                (-0.0517 + 0.00012 * t) * Math.sin(a2 + M) - (0.0386 - 0.00004
+                * t) * Math.sin(2*F+OM) - 0.0301 * Math.sin(2*(F+OM)+Mp) +
+                (0.0217 - 0.00005 * t) * Math.sin(a2 - M);
+        double nutObl = ((9.2025 + .00089 * t) * Math.cos(OM) + (0.5736 -
+                0.00031 * t) * Math.cos(a2) + (.0977 - 0.00005 * t) * Math.cos(a3)) +
+                (-0.0895 + 0.00005 * t) * Math.cos(2 * OM) + (0.0054 - 0.00001
+                * t) * Math.cos(M) - 0.00007 * Math.cos(Mp) +
+                (0.0224 - 0.00006 * t) * Math.cos(a2 + M) + 0.0200 *
+                Math.cos(2*F+OM);
+
+        return new double[] {nutLon * Constants.ARCSEC_TO_RAD, nutObl *
+                Constants.ARCSEC_TO_RAD};
     }
 }

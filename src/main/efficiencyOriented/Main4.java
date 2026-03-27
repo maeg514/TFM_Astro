@@ -35,7 +35,13 @@ Dentro de los parámetros a elegir tenemos:
 	- Posibles ideas para probar la precisión del código - gráficos
 	- Grafico de los errores en el cielo a lo largo del tiempo
 	- Grafico de la curvatura en la trayectoria de apophis durante su tránsito cerca de la Tierra
+	- Probar añadiendo asteroide con mas(top16 hace horizon)
+	- corregir coordenadas astrométricas
+	- probar metodo normand-prince (es un poco peor, probar cambiando el paso)
 
+
+- joptionPanel //PRimera opcion
+- jMessageDialog
  */
 
 /*

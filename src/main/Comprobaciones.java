@@ -19,16 +19,8 @@ public class Comprobaciones {
         String url2 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
-        //String resultado = query(url);
-        //System.out.println(resultado);
-        double[][] coefPosicion = new double[][]{{1 / 3.}, {-1 / 3., 1}, {1, -1, 1}};
-        double[][] aja = new double[3][3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                aja[i][j] += 2;
-            }
-        }
-        System.out.println(Arrays.deepToString(aja));
+        String resultado = query(url);
+        System.out.println(resultado);
     }
 
     /**

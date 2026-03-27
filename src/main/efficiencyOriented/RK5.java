@@ -6,7 +6,7 @@ import main.objectOriented.Body;
 import java.util.List;
 
 public class RK5 {
-    static final int RK_ORDER = 5;
+    static final int RK_ORDER = 7;
     List<Body> bodies;
     final int NUMBER_OF_BODIES;
     double[][] pos_vel_Initial;
@@ -21,9 +21,17 @@ public class RK5 {
 
 
     public void RK(double a, double b, double h) {
-        double[][] coefPosicion = new double[][]{{1 / 3.}, {-1 / 3., 1}, {1, -1, 1}}; // API Matriz
-        double[] coefRunge = new double[]{1 / 8., 3 / 8., 3 / 8., 1 / 8.};
-
+        double[][] coefPosicion = {
+                {1.0/6.0},
+                {2.0/27.0, 4.0/27.0},
+                {183.0/1372.0, -162.0/343.0, 1053.0/1372.0},
+                {68.0/297.0, -4.0/11.0, 42.0/143.0, 1960.0/3861.0},
+                {597.0/22528.0, 81.0/352.0, 63099.0/585728.0, 58653.0/366080.0, 4617.0/20480.0},
+                {174197.0/959244.0, -30942.0/79937.0, 8152137.0/19744439.0, 666106.0/1039181.0, -29421.0/29068.0, 482048.0/414219.0},
+                {587.0/8064.0, 0.0, 4440339.0/15491840.0, 24353.0/124800.0, 387.0/44800.0, 2152.0/5985.0, 7267.0/94080.0}
+        }; // API Matriz
+        double[] coefRunge = new double[] { 587 / 8064.0, 0, 4440339 / 15491840.,
+                24353 / 124800., 387 / 44800., 2152 / 5985., 7267 / 94080.};
 
 
         int N = (int) ((b - a) / h);

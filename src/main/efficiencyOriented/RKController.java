@@ -30,12 +30,14 @@ public class RKController {
         double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
         double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
         double integrationEndTime3 = 0.2;
-        double integrationStep2 = 0.1;
+        double integrationStep2 = 0.075;
         double integrationStep = 1.0;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
         //rungeKutta.RK4(0, integrationEndTime2, integrationStep2);
         System.out.println("CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-        rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
+        //rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
+        RK5 rungeKutta = new RK5(bodies);
+        rungeKutta.RK(0, integrationEndTime2, integrationStep2);
         double[][] resultado = rungeKutta.getPos_vel_Initial();
 
 
@@ -88,7 +90,7 @@ public class RKController {
         obsLon *= Constants.DEG_TO_RAD;
         obsLat *= Constants.DEG_TO_RAD;
 
-        Body earth = bodies.get(3);
+        Body earth = bodies.get(3); // TODO: Obtener por nombre
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
             double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
@@ -179,6 +181,7 @@ public class RKController {
         bodies.add(moon);
         bodies.add(pluto);
         bodies.add(apophis);
+        //bodies.add(ceres);
     }
 
     private void updateBodies(double[][] results) {
