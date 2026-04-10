@@ -5,8 +5,8 @@ import main.objectOriented.Body;
 
 import java.util.List;
 
-public class RK5 {
-    static final int RK_ORDER = 7;
+public class RungeKutta {
+    final int RK_ORDER;
     List<Body> bodies;
     final int NUMBER_OF_BODIES;
     double[][] pos_vel_Initial;
@@ -14,19 +14,21 @@ public class RK5 {
     final double[][] positionCoefficients;
     final double[] rkCoefficients;
 
-    public RK5(List<Body> bodies, double[][] positionCoefficients, double[] rkCoefficients) {
+
+    public RungeKutta(List<Body> bodies, double[][] coefPosition, double[] coefRK) {
+        this.RK_ORDER = coefRK.length;
         this.bodies = bodies;
         this.NUMBER_OF_BODIES = bodies.size();
         this.pos_vel_Initial = bodiesIntoArray(bodies);
-        this.positionCoefficients = positionCoefficients;
-        this.rkCoefficients = rkCoefficients;
         this.pos_vel_acc_Integration = new double[NUMBER_OF_BODIES][3][3];
+        this.positionCoefficients = coefPosition;
+        this.rkCoefficients = coefRK;
     }
 
 
     public void RK(double a, double b, double h) {
-        double[][] coefPosicion = this.positionCoefficients;
-        double[] coefRunge = this.rkCoefficients;
+        double[][] coefPosicion = positionCoefficients;
+        double[] coefRunge = rkCoefficients;
 
 
         int N = (int) ((b - a) / h);
@@ -240,4 +242,6 @@ public class RK5 {
         return pos_vel_Initial;
     }
 }
+
+
 

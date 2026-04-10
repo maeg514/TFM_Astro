@@ -11,14 +11,13 @@ import java.util.Scanner;
 
 public class RKController {
     List<Body> bodies = new ArrayList<>();
-    RK4 rungeKutta;
+
 
     public RKController() {
         addBodies();
-        this.rungeKutta = new RK4(bodies);
     }
 
-    public void run() {
+    public void run(String rkType) {
 
         Scanner teclado = new Scanner(System.in);
 
@@ -34,9 +33,13 @@ public class RKController {
         double integrationStep = 1.0;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
         //rungeKutta.RK4(0, integrationEndTime2, integrationStep2);
-        System.out.println("CAMBIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         //rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
-        RK5 rungeKutta = new RK5(bodies);
+
+        //String rkType = "RK5";
+        //String rkType = "RK4I";
+        //String rkType = "RK4C";
+
+        RungeKutta rungeKutta = selectRK(rkType);
         rungeKutta.RK(0, integrationEndTime2, integrationStep2);
         double[][] resultado = rungeKutta.getPos_vel_Initial();
 
@@ -74,6 +77,18 @@ public class RKController {
         double elapsed = (endTime - currentTime) * 0.001;
         System.out.println("Time: " + (float) elapsed);
 
+    }
+
+    private RungeKutta selectRK(String RKType) {
+        switch (RKType) {
+            case "RK5":
+                return new RungeKutta(bodies, Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
+            case "RK4I":
+                return new RungeKutta(bodies, Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
+            case "RK4C":
+            default:
+                return new RungeKutta(bodies, Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
+        }
     }
 
     public void ra_dec() {//escoger body, astrometric
@@ -192,7 +207,7 @@ public class RKController {
 
             for (int j = 0; j < 3; j++) {
                 pos[j] = results[i][j];
-                vel[j] = results[i][j+3];
+                vel[j] = results[i][j + 3];
             }
             updateBody.setPositionInitial(pos);
             updateBody.setVelocityInitial(vel);

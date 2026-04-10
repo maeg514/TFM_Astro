@@ -1,5 +1,6 @@
 package main;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ public class Comprobaciones {
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
         String resultado = query(url);
         System.out.println(resultado);
+
     }
 
     /**
@@ -51,9 +53,17 @@ public class Comprobaciones {
         String inputLine;
 
         StringBuilder output = new StringBuilder(1000);
-        while ((inputLine = in.readLine()) != null) {
-            output.append(inputLine).append("\n");
-            //output.append(inputLine + Util.getLineSeparator());
+        boolean take = false;
+        boolean finished = false;
+        while ((inputLine = in.readLine()) != null && !finished) {
+            if (take) {
+                if (!inputLine.contains("$$EOE")) {
+                    output.append(inputLine).append("\n");
+                }else {
+                    finished = true;
+                }
+            }
+            if (inputLine.contains("$$SOE")) take = true;
         }
         in.close();
         return output.toString();
@@ -76,7 +86,6 @@ public class Comprobaciones {
     // X = -0.9175567641209890 Y = -0.3716242567082039 Z = -0.1610482740289097    JPL
     // X = -0.9667985251201395 Y = -0.2974911182695593 Z = -0.12799842656284177   POO
     // X = -0.9668000225179538 Y = -0.2974897281685147 Z = -0.12799798947780217   EOO
-
 
 
 }

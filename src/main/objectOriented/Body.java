@@ -202,7 +202,7 @@ public class Body {
                 radiusAU * cosLat * Math.cos(lst),
                 radiusAU * cosLat * Math.sin(lst),
                 radiusAU * Math.sin(geocLat)};
-        System.out.println(Arrays.toString(correction));
+        //System.out.println(Arrays.toString(correction));
         return correction;
     }
 
