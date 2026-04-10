@@ -102,6 +102,7 @@ public class Body {
         }
         return Math.sqrt(r_2);
     }
+
     public double distance(double[] bodyVector) {
         double r_2 = 0;
         for (int i = 0; i < position.length; i++) {
@@ -138,21 +139,27 @@ public class Body {
 
     public void ra_dec(Body body, boolean real, double[] obsPos) {//printear distancias tambien
         double ra, dec;
+
         double[] skyPosition = body.getPositionInitial().clone();
-        skyPosition = distanceVector(skyPosition);
+        skyPosition = distanceVector(skyPosition); //distancia relativa
         double[] velocity = body.getVelocityInitial();
+
         if (obsPos != null) {
+            System.out.println("PosObservador:" + obsPos[0] + " " + obsPos[1] + " " + obsPos[2]);
             for (int i = 0; i < skyPosition.length; i++) {
                 skyPosition[i] -= obsPos[i];
             }
         }
+
         if (real) {
             double distance = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2) + Math.pow(skyPosition[2], 2));
             double time = distance / Constants.c;
             for (int j = 0; j < 3; j++) {
+                System.out.println(skyPosition[j] + " " + velocity[j]);
                 skyPosition[j] = skyPosition[j] - velocity[j] * time;
             }
         }
+
         double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2)); //Math.hypot
         ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
         dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
@@ -189,6 +196,7 @@ public class Body {
                         + 0.000063 * Math.sin(2 * omega) * Constants.ARCSEC_TO_RAD
         );
 
+        last = last % (2 * Math.PI);
         return last;
     }
 
@@ -202,12 +210,15 @@ public class Body {
                 radiusAU * cosLat * Math.cos(lst),
                 radiusAU * cosLat * Math.sin(lst),
                 radiusAU * Math.sin(geocLat)};
-        //System.out.println(Arrays.toString(correction));
+        System.out.println(Arrays.toString(correction));
+        //System.out.println(obsLon+" "+obsLat+" "+ obsAlt);
+        System.out.println((lst % (2 * Math.PI)) * Constants.RAD_TO_DEG);
         return correction;
     }
 
     /**
      * Computes nutation in longitude and obliquity
+     *
      * @param jd Julian day in UT
      * @return Nutation angles in radians
      */
@@ -237,16 +248,16 @@ public class Body {
                 (0.2062 + 0.00002 * t) * Math.sin(2 * OM) + (0.1426 - 0.00034 *
                 t) * Math.sin(M) + (0.0712 + 0.00001 * t) * Math.sin(Mp) +
                 (-0.0517 + 0.00012 * t) * Math.sin(a2 + M) - (0.0386 - 0.00004
-                * t) * Math.sin(2*F+OM) - 0.0301 * Math.sin(2*(F+OM)+Mp) +
+                * t) * Math.sin(2 * F + OM) - 0.0301 * Math.sin(2 * (F + OM) + Mp) +
                 (0.0217 - 0.00005 * t) * Math.sin(a2 - M);
         double nutObl = ((9.2025 + .00089 * t) * Math.cos(OM) + (0.5736 -
                 0.00031 * t) * Math.cos(a2) + (.0977 - 0.00005 * t) * Math.cos(a3)) +
                 (-0.0895 + 0.00005 * t) * Math.cos(2 * OM) + (0.0054 - 0.00001
                 * t) * Math.cos(M) - 0.00007 * Math.cos(Mp) +
                 (0.0224 - 0.00006 * t) * Math.cos(a2 + M) + 0.0200 *
-                Math.cos(2*F+OM);
+                Math.cos(2 * F + OM);
 
-        return new double[] {nutLon * Constants.ARCSEC_TO_RAD, nutObl *
+        return new double[]{nutLon * Constants.ARCSEC_TO_RAD, nutObl *
                 Constants.ARCSEC_TO_RAD};
     }
 }

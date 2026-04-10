@@ -5,10 +5,10 @@ import main.CLI;
 
 public class Main4{
      public static void main(String[] args) {
-        /*RKController rkController = new RKController();
-        rkController.run();*/
-         CLI app = new CLI();
-         app.execute();
+        RKController rkController = new RKController();
+        rkController.run("RK5");
+         /*CLI app = new CLI();
+         app.execute();*/
     }
 }
 
@@ -42,8 +42,11 @@ Dentro de los parámetros a elegir tenemos:
 	- Probar añadiendo asteroide con mas(top16 hace horizon)
 	- corregir coordenadas astrométricas
 	- probar metodo normand-prince (es un poco peor, probar cambiando el paso)
+	- Comparar con fotometria, comprar discrepancias
+	- TODO documentar todo y deprecar clases obsoletas
 
 	TODO quitar parámetro vagabundo step
+	TODO Jlist JtextArea
 
 
 - joptionPanel //PRimera opcion
