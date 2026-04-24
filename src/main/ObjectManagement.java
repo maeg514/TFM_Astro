@@ -1,22 +1,20 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ObjectManagement {
     private static final List<Body> bodies = new ArrayList<>();
 
+    public Body getBody(String name) {
+        Iterator<Body> it = bodies.iterator();
+        Body bodySearched = null;
+        boolean found = false;
 
-    public void ra_dec() {//escoger body, astrometric
-        //arctan(y/x)
-        //arctan(z/h)
-        Body earth = bodies.get(3);
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            earth.ra_dec(skyObject, true, null);
+        while (!found && it.hasNext()) {
+            Body bodyLoop = it.next();
+            if (bodyLoop.getName().equals(name)) bodySearched = bodyLoop;
         }
+        return bodySearched;
     }
 
 
@@ -73,20 +71,49 @@ public class ObjectManagement {
         return initial_posVel;
     }
 
+    public double[] ra_dec(Body bodyCenter, Body bodyObserved, boolean real, double[] obsPos) {//printear distancias tambien
+        double ra, dec, distance;
+
+        double[] skyPosition = bodyObserved.getPositionInitial().clone();
+        skyPosition = bodyCenter.distanceVector(skyPosition); //distancia relativa
+        double[] velocity = bodyObserved.getVelocityInitial();
+
+        if (obsPos != null) {
+            for (int i = 0; i < skyPosition.length; i++) {
+                skyPosition[i] -= obsPos[i];
+            }
+        }
+
+        if (real) {
+            distance = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2) + Math.pow(skyPosition[2], 2));
+            double time = distance / Constants.c;
+            for (int j = 0; j < 3; j++) {
+                skyPosition[j] = skyPosition[j] - velocity[j] * time;
+            }
+        }
+
+        double h = Math.hypot(skyPosition[0], skyPosition[1]);
+        ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
+        dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
+        distance = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2) + Math.pow(skyPosition[2], 2));
+
+
+        return new double[]{ra, dec, distance};
+    }
 
     public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
         obsLon *= Constants.DEG_TO_RAD;
         obsLat *= Constants.DEG_TO_RAD;
 
-        Body earth = bodies.get(3); // TODO: Obtener por nombre
+        Body earth = getBody("Earth");
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
-            double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
-            earth.ra_dec(skyObject, true, vectorObserver);
+            double[] vectorObserver = Utility.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
+            ra_dec(earth, skyObject, true, vectorObserver);
         }
     }
 
-    public void vectorGeocentric() {//geometric
+    public void vectorGeocentric() {
         Body earth = bodies.get(3);
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
@@ -96,22 +123,6 @@ public class ObjectManagement {
             System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
         }
     }
-
-    public void updateBodies(double[][] results) {
-        for (int i = 0; i < bodies.size(); i++) {
-            Body updateBody = bodies.get(i);
-            double[] pos = new double[3];
-            double[] vel = new double[3];
-
-            for (int j = 0; j < 3; j++) {
-                pos[j] = results[i][j];
-                vel[j] = results[i][j + 3];
-            }
-            updateBody.setPositionInitial(pos);
-            updateBody.setVelocityInitial(vel);
-        }
-    }
-
 
     public void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
@@ -146,6 +157,21 @@ public class ObjectManagement {
         //bodies.add(ceres);
     }
 
+    public void updateBodies(double[][] results) {
+        for (int i = 0; i < bodies.size(); i++) {
+            Body updateBody = bodies.get(i);
+            double[] pos = new double[3];
+            double[] vel = new double[3];
+
+            for (int j = 0; j < 3; j++) {
+                pos[j] = results[i][j];
+                vel[j] = results[i][j + 3];
+            }
+            updateBody.setPositionInitial(pos);
+            updateBody.setVelocityInitial(vel);
+        }
+    }
+
     public List<Body> getBodies() {
         return bodies;
     }
@@ -155,17 +181,28 @@ public class ObjectManagement {
      *
      * @return String containing the Right Ascension and Declination for all bodies from Geocentric location
      */
-    public String prettyPrintRaDec() {
+    public String prettyPrintRADec(double[] config) {
         Body earth = bodies.get(3);
         StringBuilder sb = new StringBuilder();
 
-        sb.append("||----------< Right Ascension and Declination from Earth's Center Position (Geocentric) >----------||\n");
+        String title = null;
+        if (config == null) {
+            title = "Geocentric";
+        } else {
+            title = "Astrometric";
+        }
+
+        sb.append("||----------< Right Ascension and Declination from Earth's Center Position (").append(title).append(") >----------||\n");
 
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
-
+            double[] ra_dec;
             sb.append("• ").append(skyObject.getName()).append(":\n");
-            double[] ra_dec = earth.ra_dec(skyObject, true, null);
+            if (config == null) {
+                ra_dec = ra_dec(earth, skyObject, true, null);
+            } else {
+                ra_dec = ra_dec(earth, skyObject, true, Utility.vectorObserver(config[0], config[0], config[0], config[0], config[0]));
+            }
 
             sb.append("   RA  (º) → ").append(String.format(Locale.US, "%10.10f", ra_dec[0])).append("\n");
             sb.append("   Dec (º) → ").append(String.format(Locale.US, "%10.10f", ra_dec[1])).append("\n").append("\n");

@@ -29,12 +29,6 @@ public class RKController {
         double integrationStep2 = 0.075;
         double integrationStep = 1.0;
         System.out.println("Integration End Time should be: " + integrationEndTime2);
-        //rungeKutta.RK4(0, integrationEndTime2, integrationStep2);
-        //rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
-
-        //String rkType = "RK5";
-        //String rkType = "RK4I";
-        //String rkType = "RK4C";
 
         RungeKutta rungeKutta = selectRK(rkType);
         rungeKutta.RK(0, integrationEndTime2, integrationStep2);
@@ -54,7 +48,8 @@ public class RKController {
 
         if (approveChanges.equals("y")) {
             Utility.arrayPrinter(objects.getBodies());
-            objects.ra_dec();
+            String ra_decG = objects.prettyPrintRADec(null);
+            System.out.println(ra_decG);
             objects.vectorGeocentric();
             //changesChecking();
         }
@@ -62,8 +57,11 @@ public class RKController {
         double lon = -(3 + 42 / 60.0);
         double lat = 40 + 26 / 60.0;
         double alt = 0;
-        objects.ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
 
+        double[] astrometricConfiguration = new double[]{jd, ttMinusUt * 86400, lon, lat, alt};
+        //objects.ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
+        String ra_decA = objects.prettyPrintRADec(astrometricConfiguration);
+        System.out.println(ra_decA);
 
         long endTime = System.currentTimeMillis();
         double elapsed = (endTime - currentTime) * 0.001;
@@ -72,26 +70,20 @@ public class RKController {
     }
 
     private RungeKutta selectRK(String RKType) {
-        switch (RKType) {
-            case "RK5":
-                return new RungeKutta(objects.getBodies(), Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
-            case "RK4I":
-                return new RungeKutta(objects.getBodies(), Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
-            case "RK4C":
-            default:
-                return new RungeKutta(objects.getBodies(), Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
-        }
+        return switch (RKType) {
+            case "RK5" ->
+                    new RungeKutta(objects.getBodies(), Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
+            case "RK4I" ->
+                    new RungeKutta(objects.getBodies(), Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
+            default ->
+                    new RungeKutta(objects.getBodies(), Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
+        };
     }
 
 
 
     private void saveResult() {
 
-    }
-
-
-    public List<Body> getBodies() {
-        return objects.getBodies();
     }
 
     public ObjectManagement getObjects() {

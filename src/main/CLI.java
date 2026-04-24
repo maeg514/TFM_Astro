@@ -55,7 +55,7 @@ public class CLI {
             rkController.run(seleccion);
 
             ObjectManagement objects = rkController.getObjects();
-            String summary = objects.prettyPrintRaDec();
+            String summary = objects.prettyPrintRADec(null);
 
             updateUI(summary);
 
