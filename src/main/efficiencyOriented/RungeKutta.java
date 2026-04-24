@@ -1,7 +1,7 @@
 package main.efficiencyOriented;
 
 import main.Constants;
-import main.objectOriented.Body;
+import main.Body;
 
 import java.util.List;
 
@@ -213,7 +213,7 @@ public class RungeKutta {
         ac[2] -= (a1 * posAux[2] + a2 * tz) / r2;
     }
 
-    private double[][] bodiesIntoArray(List<Body> bodies) {
+    public double[][] bodiesIntoArray(List<Body> bodies) {
         double[][] initial_posVel = new double[bodies.size()][6];
         for (int i = 0; i < bodies.size(); i++) {
             double[] pos = bodies.get(i).getPositionInitial().clone();

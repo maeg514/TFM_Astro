@@ -1,10 +1,15 @@
 package main.efficiencyOriented;
 
 import main.Constants;
-import main.objectOriented.Body;
+import main.Body;
 
 import java.util.List;
 
+/**
+ * @deprecated Esta clase ha sido reemplazada por {@link RungeKutta}.
+ * Usa RungeKutta para nuevas implementaciones.
+ */
+@Deprecated()
 public class RK5 {
     static final int RK_ORDER = 7;
     List<Body> bodies;

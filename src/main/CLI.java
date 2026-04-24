@@ -1,11 +1,13 @@
 package main;
 
-import main.efficiencyOriented.RKController;
-
 import javax.swing.*;
+import java.awt.*;
 
 public class CLI {
     private final RKController rkController;
+
+    private JFrame frame;
+    private JTextArea textArea;
 
     public CLI() {
         this.rkController = new RKController();
@@ -23,41 +25,66 @@ public class CLI {
 
     private void run() {
         String[] opciones = {"RK5", "RK4I", "RK4C", "Salir"};
-        int eleccion = -1;
-        while (eleccion != 3) {
-            eleccion = JOptionPane.showOptionDialog(
-                    null,
-                    "Elige una opción:",
-                    "Menú",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    opciones,
-                    opciones[0]
-            );
-            String rkType = null;
+        initUI();
+        while (true) {
+            JList<String> list = new JList<>(opciones);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            list.setSelectedIndex(0);
 
-            switch (eleccion) {
-                case 0:
-                    JOptionPane.showMessageDialog(null, "Elegiste RK5");
-                    rkType = "RK5";
-                    break;
-                case 1:
-                    JOptionPane.showMessageDialog(null, "Elegiste RK4I");
-                    rkType = "RK5";
-                    break;
-                case 2:
-                    JOptionPane.showMessageDialog(null, "Elegiste RK4C");
-                    rkType = "RK5";
-                default:
-                    JOptionPane.showMessageDialog(null, "Saliendo");
+            int result = JOptionPane.showConfirmDialog(
+                    null,
+                    new JScrollPane(list),
+                    "Elige una opción",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (result != JOptionPane.OK_OPTION) {
+                break;
             }
-            if (rkType != null) rkController.run(rkType);
+
+            String seleccion = list.getSelectedValue();
+
+            if (seleccion == null || seleccion.equals("Salir")) {
+                JOptionPane.showMessageDialog(null, "Saliendo");
+                break;
+            }
+
+            JOptionPane.showMessageDialog(null, "Elegiste " + seleccion);
+
+            rkController.run(seleccion);
+
+            ObjectManagement objects = rkController.getObjects();
+            String summary = objects.prettyPrintRaDec();
+
+            updateUI(summary);
+
+            objects.addBodies();
 
         }
     }
 
     private void close() {
         System.out.println("Cerrando la aplicación");
+    }
+
+    private void initUI() {
+        frame = new JFrame("Matriz");
+        textArea = new JTextArea(20, 100);
+        textArea.setEditable(false);
+
+        frame.add(new JScrollPane(textArea));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        textArea.setBackground(Constants.colorBackground);
+        textArea.setForeground(Constants.colorText);
+        textArea.setFont(new Font("Consolas", Font.PLAIN, 16));
+    }
+
+    private void updateUI(String text) {
+        textArea.setText(text);
+        textArea.setCaretPosition(0);
+        textArea.setEditable(false);
     }
 }

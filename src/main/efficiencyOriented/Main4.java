@@ -1,14 +1,13 @@
 package main.efficiencyOriented;
 
-
-import main.CLI;
+import main.RKController;
 
 public class Main4{
      public static void main(String[] args) {
         RKController rkController = new RKController();
         rkController.run("RK5");
-         /*CLI app = new CLI();
-         app.execute();*/
+        /*CLI app = new CLI();
+        app.execute();*/
     }
 }
 
@@ -44,6 +43,7 @@ Dentro de los parámetros a elegir tenemos:
 	- probar metodo normand-prince (es un poco peor, probar cambiando el paso)
 	- Comparar con fotometria, comprar discrepancias
 	- TODO documentar todo y deprecar clases obsoletas
+	- TODO probar añadiendo los 16 cuerpos extra que utiliza Horizons
 
 	TODO quitar parámetro vagabundo step
 	TODO Jlist JtextArea

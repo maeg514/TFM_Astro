@@ -1,8 +1,4 @@
-package main.objectOriented;
-
-import main.Constants;
-
-import java.util.Arrays;
+package main;
 
 public class Body {
     private String name;
@@ -137,7 +133,7 @@ public class Body {
         return vectorVelocity;
     }
 
-    public void ra_dec(Body body, boolean real, double[] obsPos) {//printear distancias tambien
+    public double[] ra_dec(Body body, boolean real, double[] obsPos) {//printear distancias tambien
         double ra, dec;
 
         double[] skyPosition = body.getPositionInitial().clone();
@@ -145,7 +141,7 @@ public class Body {
         double[] velocity = body.getVelocityInitial();
 
         if (obsPos != null) {
-            System.out.println("PosObservador:" + obsPos[0] + " " + obsPos[1] + " " + obsPos[2]);
+            //System.out.println("PosObservador:" + obsPos[0] + " " + obsPos[1] + " " + obsPos[2]);
             for (int i = 0; i < skyPosition.length; i++) {
                 skyPosition[i] -= obsPos[i];
             }
@@ -155,7 +151,7 @@ public class Body {
             double distance = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2) + Math.pow(skyPosition[2], 2));
             double time = distance / Constants.c;
             for (int j = 0; j < 3; j++) {
-                System.out.println(skyPosition[j] + " " + velocity[j]);
+                //System.out.println(skyPosition[j] + " " + velocity[j]);
                 skyPosition[j] = skyPosition[j] - velocity[j] * time;
             }
         }
@@ -163,7 +159,9 @@ public class Body {
         double h = Math.sqrt(Math.pow(skyPosition[0], 2) + Math.pow(skyPosition[1], 2)); //Math.hypot
         ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
         dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
-        System.out.println(body.getName() + " | " + ra + ": " + dec);
+
+        return new double[]{ra, dec};
+        //System.out.println(body.getName() + " | " + ra + ": " + dec);
     }
 
     public double localApparentSiderealTime(double jd_ut, double ttMinusUT, double obsLon) {
@@ -210,9 +208,9 @@ public class Body {
                 radiusAU * cosLat * Math.cos(lst),
                 radiusAU * cosLat * Math.sin(lst),
                 radiusAU * Math.sin(geocLat)};
-        System.out.println(Arrays.toString(correction));
+        //System.out.println(Arrays.toString(correction));
         //System.out.println(obsLon+" "+obsLat+" "+ obsAlt);
-        System.out.println((lst % (2 * Math.PI)) * Constants.RAD_TO_DEG);
+        //System.out.println((lst % (2 * Math.PI)) * Constants.RAD_TO_DEG);
         return correction;
     }
 

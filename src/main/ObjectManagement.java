@@ -1,95 +1,13 @@
-package main.efficiencyOriented;
-
-import main.Constants;
-import main.objectOriented.Body;
-import main.Utility;
+package main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Locale;
 
-public class RKController {
-    List<Body> bodies = new ArrayList<>();
+public class ObjectManagement {
+    private static final List<Body> bodies = new ArrayList<>();
 
-
-    public RKController() {
-        addBodies();
-    }
-
-    public void run(String rkType) {
-
-        Scanner teclado = new Scanner(System.in);
-
-        long currentTime = System.currentTimeMillis();
-
-        double ttMinusUt = 69.185 / 86400.0;
-        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
-        //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
-        double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
-        double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-        double integrationEndTime3 = 0.2;
-        double integrationStep2 = 0.075;
-        double integrationStep = 1.0;
-        System.out.println("Integration End Time should be: " + integrationEndTime2);
-        //rungeKutta.RK4(0, integrationEndTime2, integrationStep2);
-        //rungeKutta.RK4_v2(0, integrationEndTime2, integrationStep2);
-
-        //String rkType = "RK5";
-        //String rkType = "RK4I";
-        //String rkType = "RK4C";
-
-        RungeKutta rungeKutta = selectRK(rkType);
-        rungeKutta.RK(0, integrationEndTime2, integrationStep2);
-        double[][] resultado = rungeKutta.getPos_vel_Initial();
-
-
-        //System.out.println(Arrays.deepToString(resultado));
-
-        updateBodies(resultado);
-
-
-        String approveChanges = "y";
-        /*if (changesChecking()){
-            System.out.println("¿Desea actualizar los valores de los cuerpos? (y/n)");
-            approveChanges = teclado.next();
-        }*/
-
-        if (approveChanges.equals("y")) {
-            for (Body bodyLoop : bodies) {
-                double[] p = bodyLoop.getPositionInitial();
-                double[] v = bodyLoop.getVelocityInitial();
-                System.out.println(bodyLoop.getName());
-                System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
-            }
-            ra_dec();
-            vectorGeocentric();
-            //changesChecking();
-        }
-
-        double lon = -(3 + 42 / 60.0);
-        double lat = 40 + 26 / 60.0;
-        double alt = 0;
-        ra_dec_Observer(jd, ttMinusUt * 86400, lon, lat, alt);
-
-
-        long endTime = System.currentTimeMillis();
-        double elapsed = (endTime - currentTime) * 0.001;
-        System.out.println("Time: " + (float) elapsed);
-
-    }
-
-    private RungeKutta selectRK(String RKType) {
-        switch (RKType) {
-            case "RK5":
-                return new RungeKutta(bodies, Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
-            case "RK4I":
-                return new RungeKutta(bodies, Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
-            case "RK4C":
-            default:
-                return new RungeKutta(bodies, Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
-        }
-    }
 
     public void ra_dec() {//escoger body, astrometric
         //arctan(y/x)
@@ -101,28 +19,6 @@ public class RKController {
         }
     }
 
-    public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
-        obsLon *= Constants.DEG_TO_RAD;
-        obsLat *= Constants.DEG_TO_RAD;
-
-        Body earth = bodies.get(3); // TODO: Obtener por nombre
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
-            earth.ra_dec(skyObject, true, vectorObserver);
-        }
-    }
-
-    public void vectorGeocentric() {//geometric
-        Body earth = bodies.get(3);
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) continue;
-            double[] p = earth.distanceVector(skyObject);
-            double[] v = earth.relativeVelocityVector(skyObject);
-            System.out.println(skyObject.getName());
-            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
-        }
-    }
 
     private boolean changesChecking() {
         boolean change = false;
@@ -162,11 +58,62 @@ public class RKController {
         return change;
     }
 
-    private void saveResult() {
 
+    private double[][] bodiesIntoArray(List<Body> bodies) {
+        double[][] initial_posVel = new double[bodies.size()][6];
+        for (int i = 0; i < bodies.size(); i++) {
+            double[] pos = bodies.get(i).getPositionInitial().clone();
+            double[] vel = bodies.get(i).getVelocityInitial().clone();
+
+            for (int j = 0; j < 3; j++) {
+                initial_posVel[i][j] = pos[j];
+                initial_posVel[i][j + 3] = vel[j];
+            }
+        }
+        return initial_posVel;
     }
 
-    private void addBodies() {
+
+    public void ra_dec_Observer(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
+        obsLon *= Constants.DEG_TO_RAD;
+        obsLat *= Constants.DEG_TO_RAD;
+
+        Body earth = bodies.get(3); // TODO: Obtener por nombre
+        for (Body skyObject : bodies) {
+            if (skyObject.equals(earth)) continue;
+            double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
+            earth.ra_dec(skyObject, true, vectorObserver);
+        }
+    }
+
+    public void vectorGeocentric() {//geometric
+        Body earth = bodies.get(3);
+        for (Body skyObject : bodies) {
+            if (skyObject.equals(earth)) continue;
+            double[] p = earth.distanceVector(skyObject);
+            double[] v = earth.relativeVelocityVector(skyObject);
+            System.out.println(skyObject.getName());
+            System.out.println(p[0] + " " + p[1] + " " + p[2] + " " + v[0] + " " + v[1] + " " + v[2]);
+        }
+    }
+
+    public void updateBodies(double[][] results) {
+        for (int i = 0; i < bodies.size(); i++) {
+            Body updateBody = bodies.get(i);
+            double[] pos = new double[3];
+            double[] vel = new double[3];
+
+            for (int j = 0; j < 3; j++) {
+                pos[j] = results[i][j];
+                vel[j] = results[i][j + 3];
+            }
+            updateBody.setPositionInitial(pos);
+            updateBody.setVelocityInitial(vel);
+        }
+    }
+
+
+    public void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
         Body mercury = new Body("Mercury", Constants.MASS_MERCURY, new double[]{-0.1300936053754522, -0.40059372164232543, -0.20048930201672596}, new double[]{0.021366395668016163, -0.004926299692875428, -0.004847433077772866});
         Body venus = new Body("Venus", Constants.MASS_VENUS, new double[]{-0.718302296345389, -0.04627424670211335, 0.02464063845542861}, new double[]{7.981175157753219E-4, -0.018491837481062413, -0.008369735338020125});
@@ -193,24 +140,39 @@ public class RKController {
         bodies.add(saturn);
         bodies.add(uranus);
         bodies.add(neptune);
-        bodies.add(moon);
         bodies.add(pluto);
+        bodies.add(moon);
         bodies.add(apophis);
         //bodies.add(ceres);
     }
 
-    private void updateBodies(double[][] results) {
-        for (int i = 0; i < bodies.size(); i++) {
-            Body updateBody = bodies.get(i);
-            double[] pos = new double[3];
-            double[] vel = new double[3];
+    public List<Body> getBodies() {
+        return bodies;
+    }
 
-            for (int j = 0; j < 3; j++) {
-                pos[j] = results[i][j];
-                vel[j] = results[i][j + 3];
-            }
-            updateBody.setPositionInitial(pos);
-            updateBody.setVelocityInitial(vel);
+    /**
+     * Computes nutation in longitude and obliquity
+     *
+     * @return String containing the Right Ascension and Declination for all bodies from Geocentric location
+     */
+    public String prettyPrintRaDec() {
+        Body earth = bodies.get(3);
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("||----------< Right Ascension and Declination from Earth's Center Position (Geocentric) >----------||\n");
+
+        for (Body skyObject : bodies) {
+            if (skyObject.equals(earth)) continue;
+
+            sb.append("• ").append(skyObject.getName()).append(":\n");
+            double[] ra_dec = earth.ra_dec(skyObject, true, null);
+
+            sb.append("   RA  (º) → ").append(String.format(Locale.US, "%10.10f", ra_dec[0])).append("\n");
+            sb.append("   Dec (º) → ").append(String.format(Locale.US, "%10.10f", ra_dec[1])).append("\n").append("\n");
+
         }
+
+        sb.append("||-----------------------------------------------------------------------------------------------||");
+        return sb.toString();
     }
 }

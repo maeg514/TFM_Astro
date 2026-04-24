@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.*;
+
 public class Constants {
     public static final double G = 2.9591220828411956E-04;
     public static final double UA = 149597870.7;
@@ -82,10 +84,29 @@ public class Constants {
      */
     public static final double SIDEREAL_DAY_LENGTH = 1.00273781191135448;
 
+    /**
+     * Position coefficients for the RungeKutta Order 4 Classic.
+     */
     public static final double[][] RK4C_POS_COEFFICIENTS = new double[][]{{1 / 2.}, {0, 1 / 2.}, {0, 0, 1}};
+
+    /**
+     * Final coefficients or weights for the RungeKutta Order 4 Classic.
+     */
     public static final double[] RK4C_RK_COEFFICIENTS = new double[]{1 / 6., 1 / 3., 1 / 3., 1 / 6.};
+
+    /**
+     * Improved position coefficients for the RungeKutta Order 4.
+     */
     public static final double[][] RK4I_POS_COEFFICIENTS = new double[][]{{1 / 3.}, {-1 / 3., 1}, {1, -1, 1}};
+
+    /**
+     * Final coefficients or weights for the RungeKutta Order 4 Improved.
+     */
     public static final double[] RK4I_RK_COEFFICIENTS = new double[]{1 / 8., 3 / 8., 3 / 8., 1 / 8.};
+
+    /**
+     * Position coefficients for the RungeKutta Order 5.
+     */
     public static final double[][] RK5_POS_COEFFICIENTS = {
             {1 / 6.0},
             {2 / 27.0, 4 / 27.0},
@@ -94,7 +115,14 @@ public class Constants {
             {597 / 22528.0, 81 / 352.0, 63099 / 585728.0, 58653 / 366080.0, 4617 / 20480.0},
             {174197 / 959244.0, -30942 / 79937.0, 8152137 / 19744439.0, 666106 / 1039181.0, -29421 / 29068.0, 482048 / 414219.0},
             {587 / 8064.0, 0.0, 4440339 / 15491840.0, 24353 / 124800.0, 387 / 44800.0, 2152 / 5985.0, 7267 / 94080.0}};
+
+    /**
+     * Final coefficients or weights for the RungeKutta Order 5.
+     */
     public static final double[] RK5_RK_COEFFICIENTS = new double[]{587 / 8064.0, 0, 4440339 / 15491840., 24353 / 124800., 387 / 44800., 2152 / 5985., 7267 / 94080.};
+
+    public static final Color colorBackground = Color.decode("#222222");
+    public static final Color colorText = Color.decode("#d6753d");
 
 
     //Ascii jpl ephemerides

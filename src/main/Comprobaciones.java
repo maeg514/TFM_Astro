@@ -1,6 +1,5 @@
 package main;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,18 +9,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class Comprobaciones {
     public static void main(String[] args) throws IOException, URISyntaxException {
-        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
+        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
         String url2 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
-        String resultado = query(url);
-        System.out.println(resultado);
+        /*String resultado = query(url);
+        System.out.println(resultado);*/
+
 
     }
 
