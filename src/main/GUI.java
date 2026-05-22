@@ -3,13 +3,13 @@ package main;
 import javax.swing.*;
 import java.awt.*;
 
-public class GUI {
+public class CLI {
     private final RKController rkController;
 
     private JFrame frame;
     private JTextArea textArea;
 
-    public GUI() {
+    public CLI() {
         this.rkController = new RKController();
     }
 
@@ -24,7 +24,7 @@ public class GUI {
     }
 
     private void run() {
-        String[] opciones = {"RK5", "NP", "RK4I", "RK4C", "Salir"};
+        String[] opciones = {"RK5", "RK4I", "RK4C", "Salir"};
         initUI();
         while (true) {
             JList<String> list = new JList<>(opciones);
@@ -55,7 +55,7 @@ public class GUI {
             rkController.run(seleccion);
 
             ObjectManagement objects = rkController.getObjects();
-            String summary = objects.ra_dec("Earth", null);
+            String summary = objects.prettyPrintRADec(null);
 
             updateUI(summary);
 
