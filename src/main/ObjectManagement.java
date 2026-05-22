@@ -12,7 +12,7 @@ public class ObjectManagement {
      * Prints RA (Right Ascension) and Dec (Declination) for the complete list of bodies from the position of the body selected.
      * If the topocentric array is null, then the coordinates are calculated from the body center.
      *
-     * @param bodyName Name for the body selected as the reference system.
+     * @param bodyName    Name for the body selected as the reference system.
      * @param topocentric Array containing the position of the observer.
      * @return String containing the Right Ascension and Declination for all bodies.
      */
@@ -68,6 +68,7 @@ public class ObjectManagement {
         Body apophis = new Body("Apophis", 0, new double[]{-1.037925696098939E+00, -1.268092611036419E-01, -7.404282940432429E-02}, new double[]{4.227374301759195E-03, -1.412107207094790E-02, -5.145341154842345E-03});
         Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.594982968163765E-01, -2.604198475987155E+00, -1.161962651207284E+00}, new double[]{7.551958208069564E-03, 5.004810090096610E-03, 2.674350852357362E-03});
         Body C3IATLAS = new Body("3I/ATLAS", 0, new double[]{1.253897637473739E+02, -2.721809832353439E+02, -1.037600160708741E+02}, new double[]{-1.340809972204520E-02, 2.869866907957716E-02, 1.095113063192082E-02});
+        Body kibeshigemaro = new Body("Kibeshigemaro", 0, new double[]{7.954842509693949E-02, 3.293918052167155E+00, 8.152252650302890E-01}, new double[]{-8.695163676880786E-03, -9.872469761374068E-04, 2.038448785180896E-03});
 
         bodies.clear();
 
@@ -83,6 +84,7 @@ public class ObjectManagement {
         bodies.add(pluto);
         bodies.add(moon);
         bodies.add(apophis);
+        bodies.add(kibeshigemaro);
         //bodies.add(ceres);
     }
 

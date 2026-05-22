@@ -21,9 +21,7 @@ public class Constants {
     public static final double c = (SPEED_OF_LIGHT * 0.001 / AU) * 86400.0;// En UA/dia
     public static final double mu = G / Math.pow(c, 2);
 
-    /**
-     * Normalized mass for the Earth.
-     */
+    /** Normalized mass for the Earth. */
     public static final double MASS_EARTH = 3.003489615465139E-6; //1/332946.048773;
 
     /**
@@ -123,7 +121,7 @@ public class Constants {
     /**
      * Position coefficients for the Normand Prince method.
      */
-    public static final double[][] NORMAND_PRINCE_POS_COEFFICIENTS = {
+    public static final double[][] DORMAND_PRINCE_POS_COEFFICIENTS = {
             {1 / 5.0},
             {3 / 40.0, 9 / 40.0},
             {44 / 45.0, -56 / 15.0, 32 / 9.0},
@@ -133,7 +131,7 @@ public class Constants {
     /**
      * Final coefficients or weights for the Normand Prince method.
      */
-    public static final double[] NORMAND_PRINCE_RK_COEFFICIENTS = new double[]{35 / 384.0, 0.0, 500 / 1113.0, 125 / 192.0, -2187 / 6784.0, 11 / 84.0};
+    public static final double[] DORMAND_PRINCE_RK_COEFFICIENTS = new double[]{35 / 384.0, 0.0, 500 / 1113.0, 125 / 192.0, -2187 / 6784.0, 11 / 84.0};
 
     /**
      * Normalized mass for the Sun, with the Sun as the most massive object of the Solar System.

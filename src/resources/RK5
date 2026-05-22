@@ -67,3 +67,25 @@ Pluto | -46.11228386689416: -22.987959974628655
 Moon | 19.814266712607083: 13.012784356611784
 Apophis | 124.69070209798623: 23.267062048912788
 Time: 9.882
+
+
+-4952 Kibeshigemaro (1990 FC1)  -  DES=20004952
+
+// 2025-06-26 02:45:16.5
+317.58545 -16.60668  317.94585 -16.50171
+
+// 2025-06-26 04:42:22
+317.57888 -16.61497  317.93931 -16.51002
+2460852.6957408 JD
+
+
+//Resultado con programa:
+
+• Kibeshigemaro:
+   RA  (degrees)  --> -42.41474126586236 -> 317.5852587
+   Dec (degrees)  --> -16.606741760269646
+
+Config for initial time:
+Target Body: Mercury Barycenter2
+Coordinate Center: Sun (body center) [500@10]3
+Time Specification: Start=2000-01-01 12:00:00 TDB , Stop=2000-01-01 13:00:00, Step=1 (days)4
