@@ -2,6 +2,7 @@ package main.objectOriented;
 
 import main.Body;
 import main.Constants;
+import main.Utility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public class RungeKutta4 {
                             posBody[m] = coefPosicion[j] * k[l][j - 1][m];
                             velBody[m] = coefPosicion[j] * k[l][j - 1][m + 3];
                         }
-                        bodyLoop.setPosition(posBody);
+                        bodyLoop.setPositionDelta(posBody);
                         bodyLoop.setVelocity(velBody);
                     }
                 }
@@ -106,8 +107,8 @@ public class RungeKutta4 {
                 }
                 bodyLoop.setPositionInitial(p);//por clarificar
                 bodyLoop.setVelocityInitial(v);
-                bodyLoop.position = new double[3];
-                bodyLoop.velocity = new double[3];
+                bodyLoop.positionDelta = new double[3];
+                bodyLoop.velocityDelta = new double[3];
             }
             time += h;
         }
@@ -205,7 +206,7 @@ public class RungeKutta4 {
         Body earth = bodies.get(3);
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
-            earth.ra_dec(skyObject, true, null);
+            earth.ra_dec(skyObject, null);
         }
     }
 
@@ -216,8 +217,8 @@ public class RungeKutta4 {
         Body earth = bodies.get(3);
         for (Body skyObject : bodies) {
             if (skyObject.equals(earth)) continue;
-            double[] vectorObserver = earth.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
-            earth.ra_dec(skyObject, true, vectorObserver);
+            double[] vectorObserver = Utility.vectorObserver(jd_ut, ttMinusUT, obsLon, obsLat, obsAlt);
+            earth.ra_dec(skyObject, vectorObserver);
         }
     }
 

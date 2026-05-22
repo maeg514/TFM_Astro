@@ -1,13 +1,13 @@
 package main.efficiencyOriented;
 
-import main.RKController;
+import main.GUI;
 
-public class Main4{
+public class Main {
      public static void main(String[] args) {
-        RKController rkController = new RKController();
-        rkController.run("RK5");
-        /*CLI app = new CLI();
-        app.execute();*/
+        /*RKController rkController = new RKController();
+        rkController.run("RK5");*/
+        GUI app = new GUI();
+        app.execute();
     }
 }
 
