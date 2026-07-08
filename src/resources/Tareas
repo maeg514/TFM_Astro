@@ -11,7 +11,7 @@ Dentro de los parámetros a elegir tenemos:
 
 
 - Más flexibilidad a la hora de establecer el final de la integración. Paso de TT a UTC con el día Juliano. Seguir usando 0 para el inicio *****
-	- Tal vez separar el método RK4 en varios para más claridad
+	- Tal vez separar el mét_odo RK4 en varios para más claridad
 	- Cuidado con la última iteración si se establece un punto final que requiera de un número de pasos de integración no entero ***************
 	- Implementar correcciones relativistas, de achatamiento terrestre, y fuerzas no gravitatorias en Apophis **********************************
 	- Revisión del código, mejorar organización, e ideas para optimizarlo por velocidad

@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class VelPosTest {
+public class RungeKuttaTest {
 
     @Test
     void testPositions() {
@@ -90,6 +90,7 @@ public class VelPosTest {
         return initial_posVel;
     }
 
+    //Este es el @Before
     private double[][] getValues() {
         ObjectManagement bodiesTest = new ObjectManagement();
         bodiesTest.addBodies();
