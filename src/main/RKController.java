@@ -2,6 +2,7 @@ package main;
 
 import main.efficiencyOriented.RungeKutta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RKController {
@@ -32,9 +33,9 @@ public class RKController {
 
         RungeKutta rungeKutta = selectRK(rkType);
         rungeKutta.RK(0, integrationEndTime2, integrationStep2);
-        double[][] resultado = rungeKutta.getPos_vel_Initial();
+        rungeKutta.arrayIntoBodies();
 
-        objects.updateBodies(resultado);
+        objects.updateBodies(rungeKutta.getBodies());
 
         System.out.println(objects.prettyPrintPosition(null));
 
@@ -60,22 +61,23 @@ public class RKController {
     }
 
     private RungeKutta selectRK(String RKType) {
+        List<Body> bodiesRK = new ArrayList<>(objects.getBodies().values());
         switch (RKType) {
             case "RK5":
-                return new RungeKutta(objects.getBodies(), Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
+                return new RungeKutta(bodiesRK, Constants.RK5_POS_COEFFICIENTS, Constants.RK5_RK_COEFFICIENTS);
             case "D-P":
-                return new RungeKutta(objects.getBodies(), Constants.DORMAND_PRINCE_POS_COEFFICIENTS, Constants.DORMAND_PRINCE_RK_COEFFICIENTS);
+                return new RungeKutta(bodiesRK, Constants.DORMAND_PRINCE_POS_COEFFICIENTS, Constants.DORMAND_PRINCE_RK_COEFFICIENTS);
             case "RK4I":
-                return new RungeKutta(objects.getBodies(), Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
+                return new RungeKutta(bodiesRK, Constants.RK4I_POS_COEFFICIENTS, Constants.RK4I_RK_COEFFICIENTS);
             case "RK4C":
             default:
-                return new RungeKutta(objects.getBodies(), Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
+                return new RungeKutta(bodiesRK, Constants.RK4C_POS_COEFFICIENTS, Constants.RK4C_RK_COEFFICIENTS);
         }
     }
 
 
     public List<Body> getBodies() {
-        return objects.getBodies();
+        return new ArrayList<>(objects.getBodies().values());
     }
 
     public ObjectManagement getObjects() {

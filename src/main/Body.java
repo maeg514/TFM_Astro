@@ -19,6 +19,13 @@ public class Body {
         this.velocityDelta = new double[3];
     }
 
+    public Body(String name, double[] positionInitial, double[] velocityInitial){
+        this.name = name;
+        this.mass = 0;
+        this.positionInitial = positionInitial;
+        this.velocityInitial = velocityInitial;
+    }
+
     public String getName() {
         return name;
     }

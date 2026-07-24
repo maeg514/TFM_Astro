@@ -1,12 +1,9 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ObjectManagement {
-    private static final List<Body> bodies = new ArrayList<>();
+    private static final HashMap<String, Body> bodies = new HashMap<>();
 
     /**
      * Prints RA (Right Ascension) and Dec (Declination) for the complete list of bodies from the position of the body selected.
@@ -33,24 +30,15 @@ public class ObjectManagement {
     /**
      * Updates the position for the bodies in the list with the results obtained with the RungeKutta method.
      */
-    public void updateBodies(double[][] results) {
-        for (int i = 0; i < bodies.size(); i++) {
-            Body updateBody = bodies.get(i);
-            double[] pos = new double[3];
-            double[] vel = new double[3];
-
-            for (int j = 0; j < 3; j++) {
-                pos[j] = results[i][j];
-                vel[j] = results[i][j + 3];
-            }
-            updateBody.setPositionInitial(pos);
-            updateBody.setVelocityInitial(vel);
+    public void updateBodies(List<Body> bodiesUpdate) {
+        for (Body updateBody : bodiesUpdate) {
+            bodies.put(updateBody.getName(), updateBody);
         }
     }
 
 
     /**
-     * Creates instances and adds the bodies needed for the correct characterization of the Solar System.
+     * Creates instances and adds the bodies needed for the correct characterization of the Solar System and adds them to the hashmap with the name of the body as the Key and the Body as the Value.
      */
     public void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
@@ -72,23 +60,24 @@ public class ObjectManagement {
 
         bodies.clear();
 
-        bodies.add(sun);
-        bodies.add(mercury);
-        bodies.add(venus);
-        bodies.add(earth);
-        bodies.add(mars);
-        bodies.add(jupiter);
-        bodies.add(saturn);
-        bodies.add(uranus);
-        bodies.add(neptune);
-        bodies.add(pluto);
-        bodies.add(moon);
-        bodies.add(apophis);
-        bodies.add(kibeshigemaro);
+
+        bodies.put(sun.getName(), sun);
+        bodies.put(mercury.getName(), mercury);
+        bodies.put(venus.getName(), venus);
+        bodies.put(earth.getName(), earth);
+        bodies.put(mars.getName(), mars);
+        bodies.put(jupiter.getName(), jupiter);
+        bodies.put(saturn.getName(), saturn);
+        bodies.put(uranus.getName(), uranus);
+        bodies.put(neptune.getName(), neptune);
+        bodies.put(pluto.getName(), pluto);
+        bodies.put(moon.getName(), moon);
+        bodies.put(apophis.getName(), apophis);
+        //bodies.put(kibeshigemaro.getName(), kibeshigemaro);
         //bodies.add(ceres);
     }
 
-    public List<Body> getBodies() {
+    public HashMap<String, Body> getBodies() {
         return bodies;
     }
 
@@ -102,7 +91,7 @@ public class ObjectManagement {
 
         sb.append("||----------< Right Ascension and Declination from Earth's Center Position (Geocentric) >----------||\n");
 
-        for (Body skyObject : bodies) {
+        for (Body skyObject : bodies.values()) {
             if (skyObject.getName().equals("Earth")) continue;
 
             sb.append("• ").append(skyObject.getName()).append(":\n");
@@ -133,7 +122,7 @@ public class ObjectManagement {
 
         sb.append("||----------< Right Ascension and Declination from Earth's Center Position (Topocentric) >----------||\n");
 
-        for (Body skyObject : bodies) {
+        for (Body skyObject : bodies.values()) {
             if (skyObject.getName().equals("Earth")) continue;
 
             sb.append("• ").append(skyObject.getName()).append(":\n");
@@ -158,14 +147,14 @@ public class ObjectManagement {
      * @return String containing position and velocity for all bodies.
      */
     public String prettyPrintPosition(String name) {
-        Body earth = getBody(name);
+        Body earth = bodies.get(name);
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("                    |------------------------------------------------------------------------|------------------------------------------------------------------------|\n");
         sb.append("                    |                           POSITION (X, Y, Z)                           |                          VELOCITY (VX, VY, VZ)                         |\n");
         sb.append("                    |------------------------------------------------------------------------|------------------------------------------------------------------------|\n");
-        for (Body bodyPrint : bodies) {
+        for (Body bodyPrint : bodies.values()) {
             double[] p;
             double[] v;
 
@@ -195,7 +184,7 @@ public class ObjectManagement {
     public Body getBody(String name) {
         Body body = null;
 
-        for (Body b : bodies) {
+        for (Body b : bodies.values()) {
             if (b.getName().equals(name)) {
                 body = b;
                 break;

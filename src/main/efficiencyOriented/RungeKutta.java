@@ -227,6 +227,20 @@ public class RungeKutta {
         return initial_posVel;
     }
 
+    public void arrayIntoBodies(){
+        for (int i = 0; i < pos_vel_Initial.length; i++) {
+            Body bodyLoop = bodies.get(i);
+            double[] posUpdate = new double[3];
+            double[] velUpdate = new double[3];
+            for (int j = 0; j < posUpdate.length; j++) {
+                posUpdate[j] = pos_vel_Initial[i][j];
+                velUpdate[j] = pos_vel_Initial[i][j+3];
+            }
+            bodyLoop.setPositionInitial(posUpdate);
+            bodyLoop.setVelocityInitial(velUpdate);
+        }
+    }
+
     private double distanceBetweenBodies(int l, int b) {
         double r_2 = 0;
         double[] posBody = pos_vel_acc_Integration[l][0];
@@ -240,6 +254,10 @@ public class RungeKutta {
 
     public double[][] getPos_vel_Initial() {
         return pos_vel_Initial;
+    }
+
+    public List<Body> getBodies() {
+        return bodies;
     }
 }
 
