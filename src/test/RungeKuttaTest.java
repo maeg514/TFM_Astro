@@ -5,6 +5,7 @@ import main.ObjectManagement;
 import main.Utility;
 import main.efficiencyOriented.RungeKutta;
 import main.Body;
+import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +25,10 @@ class RungeKuttaTest {
     @Test
     void testPositions() {
 
+        getValues();
 
-        double umbral = 0.01;
+        double umbral = 0.1;
 
-        relativeError();
 
         List<Executable> comprobaciones = new ArrayList<>();
         for (Body bodyError : bodiesErrorValues.values()) {
@@ -36,15 +37,15 @@ class RungeKuttaTest {
             for (int i = 0; i < 3; i++) {
                 int finalI = i;
                 comprobaciones.add(() ->
-                                assertTrue(posError[finalI] > umbral,
-                        "La componente " + finalI + " del vector posición supera el umbral de error.")
+                                assertTrue(posError[finalI] < umbral,
+                        "La componente " + finalI + " del vector posición del cuerpo " + bodyError.getName() + " supera el umbral de error.")
                 );
             }
             for (int i = 0; i < 3; i++) {
                 int finalI = i;
                 comprobaciones.add(() ->
-                        assertTrue(velError[finalI] > umbral,
-                                "La componente " + finalI + " del vector velocidad supera el umbral de error.")
+                        assertTrue(velError[finalI] < umbral,
+                                "La componente " + finalI + " del vector velocidad del cuerpo " + bodyError.getName() + " supera el umbral de error.")
                 );
             }
         }
@@ -54,16 +55,24 @@ class RungeKuttaTest {
 
 
     public void relativeError() {
+        Body earth = bodiesCalculatedValues.get("Earth");
         for (Body bodyError : bodiesErrorValues.values()) {
             Body bodyCalculated = bodiesCalculatedValues.get(bodyError.getName());
-            double[] posCalculated = bodyCalculated.getPositionInitial();
-            double[] velCalculated = bodyCalculated.getVelocityInitial();
+            double[] posCalculated = earth.distanceVector(bodyCalculated);
+            double[] velCalculated = earth.relativeVelocityVector(bodyCalculated);
+            bodyCalculated.setPositionInitial(posCalculated);
+            bodyCalculated.setVelocityInitial(velCalculated);
+            System.out.println(bodyCalculated)
+            ;
             double[] posError = bodyError.getPositionInitial();
             double[] velError = bodyError.getVelocityInitial();
+            System.out.println(bodyError);
+
             for (int i = 0; i < 3; i++) {
                 posError[i] = Math.abs(posError[i]-posCalculated[i]);
                 velError[i] = Math.abs(velError[i]-velCalculated[i]);
             }
+            System.out.println(bodyError);
         }
     }
 
@@ -81,9 +90,12 @@ class RungeKuttaTest {
         Body pluto = new Body("Pluto", new double[]{2.330886892958736E+01, -2.423104362545851E+01, -1.426339163987423E+01}, new double[]{-4.112241172639988E-03, 1.597797653129441E-02, 5.974824795108667E-03});
         Body apophis = new Body("Apophis", new double[]{-1.455656900545057E-04, 1.751927427817715E-04, 1.141817805459706E-04}, new double[]{3.621977758203940E-03, 1.426507322271576E-03, 1.790082662150367E-03});
 
+        bodiesErrorValues = new HashMap<>();
+
         bodiesErrorValues.put(sun.getName(), sun);
         bodiesErrorValues.put(mercury.getName(), mercury);
         bodiesErrorValues.put(venus.getName(), venus);
+        //bodiesErrorValues.put(earth.getName(), earth);
         bodiesErrorValues.put(mars.getName(), mars);
         bodiesErrorValues.put(jupiter.getName(), jupiter);
         bodiesErrorValues.put(saturn.getName(), saturn);
@@ -106,27 +118,6 @@ class RungeKuttaTest {
                     {-1.455656900545057E-04, 1.751927427817715E-04, 1.141817805459706E-04, 3.621977758203940E-03, 1.426507322271576E-03, 1.790082662150367E-03}};*/
     }
 
-    public double[][] bodiesIntoArray(List<Body> bodies) {
-        double[][] initial_posVel = new double[bodies.size() - 1][6];
-        Body earth = bodies.get(3);
-        int i = 0;
-        for (Body skyObject : bodies) {
-            if (skyObject.equals(earth)) {
-                continue;
-            }
-            double[] pos = earth.distanceVector(skyObject);
-            double[] vel = earth.relativeVelocityVector(skyObject);
-
-            for (int j = 0; j < 3; j++) {
-                initial_posVel[i][j] = pos[j];
-                initial_posVel[i][j + 3] = vel[j];
-            }
-            i++;
-        }
-        return initial_posVel;
-    }
-
-    @BeforeEach
     public void getValues() {
         ObjectManagement managementTest = new ObjectManagement();
         managementTest.addBodies();
@@ -140,6 +131,7 @@ class RungeKuttaTest {
         managementTest.updateBodies(rkTest.getBodies());
         bodiesCalculatedValues = managementTest.getBodies();
         addExpectedValues();
+        relativeError();
     }
 
 

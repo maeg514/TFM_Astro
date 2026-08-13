@@ -19,12 +19,12 @@ public class RKController {
         long currentTime = System.currentTimeMillis();
 
         double ttMinusUt = 69.185 / Constants.SECONDS_PER_DAY;
-        //double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
+        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
         //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
-        double jd = Utility.dateToJulianDay(2025,6,26,2,45,false); // UTC
+        //double jd = Utility.dateToJulianDay(2025,6,26,2,45,false); // UTC
         double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
-        //double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
-        double integrationEndTime2 = jd - 2451545.0;
+        double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
+        //double integrationEndTime2 = jd - 2451545.0;
         double integrationEndTime3 = 0.2;
         double integrationStep2 = 0.075;
         double integrationStep = 1.0;
@@ -60,6 +60,14 @@ public class RKController {
 
     }
 
+    /**
+     * Creates an instance of the Runge Kutta (RK) class with the corresponding coefficients.
+     *
+     * @param RKType String indicating the RK method chosen between the RK order 4 Classic ("RK4C"),
+     *               RK order 4 with Improved coefficients ("RK4I"), RK order 5 ("RK5")
+     *               and RK order 5 with Dormand-Prince coefficients ("D-P").
+     * @return A {@code RungeKutta} with the correct coefficients for the selected type.
+     */
     private RungeKutta selectRK(String RKType) {
         List<Body> bodiesRK = new ArrayList<>(objects.getBodies().values());
         switch (RKType) {
@@ -75,11 +83,20 @@ public class RKController {
         }
     }
 
-
+    /**
+     * Returns a list contaning the bodies of the ObjectManagement map of bodies.
+     *
+     * @return ArrayList of bodies contained in ObjectManagement.
+     */
     public List<Body> getBodies() {
         return new ArrayList<>(objects.getBodies().values());
     }
 
+    /**
+     * Gets the object management class that.
+     *
+     * @return A {@code ObjectManagement} used for the management of the bodies.
+     */
     public ObjectManagement getObjects() {
         return objects;
     }

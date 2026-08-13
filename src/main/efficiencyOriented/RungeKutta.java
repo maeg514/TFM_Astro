@@ -6,7 +6,7 @@ import main.Body;
 import java.util.List;
 
 public class RungeKutta {
-    final int RK_ORDER;
+    final int RK_STAGES;
     List<Body> bodies;
     final int NUMBER_OF_BODIES;
     double[][] pos_vel_Initial;
@@ -16,7 +16,7 @@ public class RungeKutta {
 
 
     public RungeKutta(List<Body> bodies, double[][] coefPosition, double[] coefRK) {
-        this.RK_ORDER = coefRK.length;
+        this.RK_STAGES = coefRK.length;
         this.bodies = bodies;
         this.NUMBER_OF_BODIES = bodies.size();
         this.pos_vel_Initial = bodiesIntoArray(bodies);
@@ -32,14 +32,27 @@ public class RungeKutta {
 
 
         int N = (int) ((b - a) / h);
-        System.out.println("el valor de h es: " + h);//Lanzar excepcion
+        double lastH = (b - a) % h;
+
+        double lastHC = b - a - N * h;
+        /*
+        Integration End Time should be: 10695.402189641029
+        el valor de h es: 0.075
+        142605
+        0.027189641028994807
+        Time (integration end): 10695.402189641029
+        */
+        System.out.println("el valor de h es: " + h); // TODO Lanzar excepción y poner en un método el cálculo de N
         double time = 0;
+
+
+        System.out.println(N);
+        System.out.println(lastH);
+        System.out.println(lastHC);
+
         for (int i = 0; i < N + 1; i++) {
 
-
-            time = a + i * h;
             if (i == N) {
-                double lastH = b - time;
                 if (lastH == 0) break;
                 h = lastH;
             }
@@ -47,7 +60,7 @@ public class RungeKutta {
             double[][][] k = new double[NUMBER_OF_BODIES][coefRunge.length][6];
 
 
-            for (int j = 0; j < RK_ORDER; j++) {
+            for (int j = 0; j < RK_STAGES; j++) {
                 double[][] delta_PosVel = new double[NUMBER_OF_BODIES][6];
                 for (int l = 0; l < bodies.size(); l++) {
                     for (int m = 0; m < 3; m++) {
@@ -173,13 +186,13 @@ public class RungeKutta {
         for (int i = 0; i < 3; i++) {
             vectorAux[i] = posBodyLoop[i] - posBody[i];
         }
-        double factor = -Constants.J2 / Math.pow(d, 7);
-        double factor3 = (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2));
-        double factor2 = 6 * Math.pow(vectorAux[2], 2) - 1.5 * factor3;
+        double global_factor = -Constants.J2 / Math.pow(d, 7);
+        double factor_xy_squared_sum = (Math.pow(vectorAux[0], 2) + Math.pow(vectorAux[1], 2));
+        double final_factor_xy = 6 * Math.pow(vectorAux[2], 2) - 1.5 * factor_xy_squared_sum;
 
-        ac[0] += factor * vectorAux[0] * factor2;
-        ac[1] += factor * vectorAux[1] * factor2;
-        ac[2] += factor * vectorAux[2] * (3 * Math.pow(vectorAux[2], 2) - 4.5 * factor3);
+        ac[0] += global_factor * vectorAux[0] * final_factor_xy;
+        ac[1] += global_factor * vectorAux[1] * final_factor_xy;
+        ac[2] += global_factor * vectorAux[2] * (3 * Math.pow(vectorAux[2], 2) - 4.5 * factor_xy_squared_sum);
     }
 
     // Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.

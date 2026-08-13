@@ -39,6 +39,7 @@ public class ObjectManagement {
 
     /**
      * Creates instances and adds the bodies needed for the correct characterization of the Solar System and adds them to the hashmap with the name of the body as the Key and the Body as the Value.
+     * (TDB 2000-01-01 12:00) Sun Body center 500@10
      */
     public void addBodies() {
         Body sun = new Body("Sun", Constants.MASS_SUN, new double[]{0, 0, 0}, new double[]{0, 0, 0});
@@ -51,12 +52,34 @@ public class ObjectManagement {
         Body saturn = new Body("Saturn", Constants.MASS_SATURN, new double[]{6.406408859532808, 6.174657792651239, 2.274770783705428}, new double[]{-0.00429235187384325, 0.0035283445659715523, 0.0016419315191857945});
         Body uranus = new Body("Uranus", Constants.MASS_URANUS, new double[]{14.431856614381783, -12.506266259007408, -5.681690059289029}, new double[]{0.00267810559142015, 0.002462004302669807, 0.0010404094481152937});
         Body neptune = new Body("Neptune", Constants.MASS_NEPTUNE, new double[]{16.812046968052883, -22.980100505749114, -9.824427653612803}, new double[]{0.002579274259047737, 0.001668425282316438, 6.188152032295604E-4});
-        Body pluto = new Body("Pluto", Constants.MASS_PLUTO, new double[]{-9.87535222992358, -27.978868119163504, -5.753691421762491}, new double[]{0.0030287508460142658, -0.001127593278936313, -0.001265129364676525});
+        Body pluto = new Body("Pluto", Constants.MASS_PLUTO, new double[]{-9.87535222992358, -27.978868119163504, -5.753691421762491}, new double[]{0.0030287508460142658, -0.001127593278936313, -0.001265129364676525}); //no coincide con horizons
+
+        // 16 cuerpos menores que tiene en cuenta JPL
         Body ceres = new Body("Ceres", Constants.MASS_CERES, new double[]{-2.379327705912632E+00, 5.456711318714194E-01, 7.412254807098526E-01}, new double[]{-3.584228273217894E-03, -9.845217307737637E-03, -3.904543826022410E-03});
+        Body vesta = new Body("Vesta", Constants.MASS_VESTA, new double[]{1.243605461680222E+00, 2.133870405923554E+00, 6.874866847781977E-01}, new double[]{-8.779290950353064E-03, 4.462599423343603E-03, 2.927653651039283E-03}); //Se utilizó el SB de JPL
+        Body pallas = new Body("Pallas", Constants.MASS_PALLAS, new double[]{-8.411384433388419E-01, 1.944444968595056E+00, -3.274545822177069E-01}, new double[]{-1.173753499559210E-02, -5.300336219764020E-03, 1.862824062653985E-03}); //SB
+        Body hygiea = new Body("Hygiea", Constants.MASS_HYGIEA, new double[]{-2.374062486038638E+00, -1.271928530960060E+00, -7.456415084531227E-01}, new double[]{6.109725584714315E-03, -8.312981774250642E-03, -3.324251433567044E-03}); //SB
+        Body davida = new Body("Davida", Constants.MASS_DAVIDA, new double[]{-2.559593623470846E-01, -3.570257891952850E+00, -1.118571415085192E+00}, new double[]{7.727143597701131E-03, 8.384749989470708E-05, -2.179735688557923E-03}); //SB
+        Body interamnia = new Body("Interamnia", Constants.MASS_INTERAMNIA, new double[]{-1.356753642919263E+00, -2.490233973485644E+00, -1.719578360179235E+00}, new double[]{8.211143716569797E-03, -3.677817626488679E-03, 9.607221729043243E-04}); //SB
+        Body europa = new Body("Europa", Constants.MASS_EUROPA, new double[]{-2.742739560307649E+00, 7.159048917754582E-01, 5.363944361812114E-01}, new double[]{-3.797092088551376E-03, -9.359087295313760E-03, -2.764542342261691E-03}); //SB
+        Body sylvia = new Body("Sylvia", Constants.MASS_SYLVIA, new double[]{-1.243450709480745E-02, 3.182851885015189E+00, 1.595471309821621E+00}, new double[]{-8.847643547576252E-03, -1.331158216094903E-04, 1.748886022145435E-03}); //SB
+        Body eunomia = new Body("Eunomia", Constants.MASS_EUNOMIA, new double[]{-2.587398928455714E+00, 1.226024025883543E+00, 9.909957454443644E-02}, new double[]{-5.175498480382019E-03, -6.744880465907278E-03, -4.729689263274217E-03}); //SB
+        Body juno = new Body("Juno", Constants.MASS_JUNO, new double[]{3.841773243423457E-01, -3.039797417312752E+00, -5.869332904676425E-01}, new double[]{8.411460625023161E-03, 2.828740126962025E-03, 2.041835262248759E-04}); //SB
+        Body psyche = new Body("Psyche", Constants.MASS_PSYCHE, new double[]{2.502682689905626E+00, -4.963200139481901E-01, -2.592260824536308E-01}, new double[]{1.730892123600570E-03, 1.053220086828449E-02, 3.940457550580482E-03}); //SB
+        Body camilla = new Body("Camilla", Constants.MASS_CAMILLA, new double[]{-1.198690949093367E-01, 3.137868182744258E+00, 7.535477772494622E-01}, new double[]{-9.875171428454163E-03, -7.590603708244406E-04, 2.883016100027749E-05}); //SB
+        Body thisbe = new Body("Thisbe", Constants.MASS_THISBE, new double[]{6.008946089881430E-01, -2.103402661523676E+00, -8.797571084555780E-01}, new double[]{1.133620032706874E-02, 3.062874876590536E-03, 2.494564228242002E-03}); //SB
+        Body iris = new Body("Iris", Constants.MASS_IRIS, new double[]{-1.170852109858923E+00, 1.713075339113774E+00, 5.877481809134372E-01}, new double[]{-1.140411295399638E-02, -3.627708315228408E-03, -2.674818418976173E-03}); //SB
+        Body euphrosyne = new Body("Euphrosyne", Constants.MASS_EUPHROSYNE, new double[]{2.991570928199286E+00, 6.427953077511142E-02, -9.596726903023471E-01}, new double[]{-2.013552676903032E-04, 6.662965887950446E-03, 7.060117159991139E-03}); //SB
+        Body cybele = new Body("Cybele", Constants.MASS_CYBELE, new double[]{-2.595759435191407E+00, 2.344640792620458E+00, 9.328164217953492E-01}, new double[]{-5.543337668789665E-03, -6.452077986352413E-03, -2.224482257965874E-03}); //SB
+
+        // Cuerpos de estudio
         Body apophis = new Body("Apophis", 0, new double[]{-1.037925696098939E+00, -1.268092611036419E-01, -7.404282940432429E-02}, new double[]{4.227374301759195E-03, -1.412107207094790E-02, -5.145341154842345E-03});
         Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.594982968163765E-01, -2.604198475987155E+00, -1.161962651207284E+00}, new double[]{7.551958208069564E-03, 5.004810090096610E-03, 2.674350852357362E-03});
         Body C3IATLAS = new Body("3I/ATLAS", 0, new double[]{1.253897637473739E+02, -2.721809832353439E+02, -1.037600160708741E+02}, new double[]{-1.340809972204520E-02, 2.869866907957716E-02, 1.095113063192082E-02});
+
+        // Imágenes
         Body kibeshigemaro = new Body("Kibeshigemaro", 0, new double[]{7.954842509693949E-02, 3.293918052167155E+00, 8.152252650302890E-01}, new double[]{-8.695163676880786E-03, -9.872469761374068E-04, 2.038448785180896E-03});
+
 
         bodies.clear();
 
@@ -72,9 +95,27 @@ public class ObjectManagement {
         bodies.put(neptune.getName(), neptune);
         bodies.put(pluto.getName(), pluto);
         bodies.put(moon.getName(), moon);
+
         bodies.put(apophis.getName(), apophis);
         //bodies.put(kibeshigemaro.getName(), kibeshigemaro);
-        //bodies.add(ceres);
+
+/*
+        bodies.put(ceres.getName(), ceres);
+        bodies.put(vesta.getName(), vesta);
+        bodies.put(pallas.getName(), pallas);
+        bodies.put(hygiea.getName(), hygiea);
+        bodies.put(davida.getName(), davida);
+        bodies.put(interamnia.getName(), interamnia);
+        bodies.put(europa.getName(), europa);
+        bodies.put(sylvia.getName(), sylvia);
+        bodies.put(eunomia.getName(), eunomia);
+        bodies.put(juno.getName(), juno);
+        bodies.put(psyche.getName(), psyche);
+        bodies.put(camilla.getName(), camilla);
+        bodies.put(thisbe.getName(), thisbe);
+        bodies.put(iris.getName(), iris);
+        bodies.put(euphrosyne.getName(), euphrosyne);
+        bodies.put(cybele.getName(),cybele);*/
     }
 
     public HashMap<String, Body> getBodies() {

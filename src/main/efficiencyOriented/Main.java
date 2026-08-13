@@ -1,19 +1,18 @@
 package main.efficiencyOriented;
 
 import main.GUI;
+import main.RKController;
 
 public class Main {
      public static void main(String[] args) {
-        /*RKController rkController = new RKController();
-        rkController.run("RK5");*/
-        GUI app = new GUI();
-        app.execute();
+        RKController rkController = new RKController();
+        rkController.run("RK5");
+        /*GUI app = new GUI();
+        app.execute();*/
     }
 }
 
 //Terminar cambios tareas
-//Printear con un poco más de sentido las cosas
-//Implementar el JUnit para los test (No se si esto puede ir de la mano de lo que tienen Horizons)
 /*
 Se podría hacer una especie de menu que te deje ejecutar el runge kutta de forma bruta o con una configuración personalizada.
 Dentro de los parámetros a elegir tenemos:
@@ -36,20 +35,16 @@ Dentro de los parámetros a elegir tenemos:
 	- Implementación del RK de orden 5: comparación con Horizons durante miles de años usando TDB
 	- Trayectoria de Apophis y 2024 YR4 desde un observador en Madrid. Comparación con Horizons. Qué ocurre si se añaden asteroides con masa ?
 	- Posibles ideas para probar la precisión del código - gráficos
-	- Grafico de los errores en el cielo a lo largo del tiempo
-	- Grafico de la curvatura en la trayectoria de apophis durante su tránsito cerca de la Tierra
-	- Probar añadiendo asteroide con mas(top16 hace horizon)
 	- corregir coordenadas astrométricas
 	- probar metodo normand-prince (es un poco peor, probar cambiando el paso)
-	- Comparar con fotometria, comprar discrepancias
+	- TODO Comparar con fotometria, comprar discrepancias
 	- TODO documentar todo y deprecar clases obsoletas
 	- TODO probar añadiendo los 16 cuerpos extra que utiliza Horizons
+	- TODO quitar parámetro vagabundo step
+	- TODO Grafico de los errores en el cielo a lo largo del tiempo
+	- TODO Grafico de la curvatura en la trayectoria de apophis durante su tránsito cerca de la Tierra
 
-	TODO quitar parámetro vagabundo step
-	TODO Jlist JtextArea
 
 
-- joptionPanel //PRimera opcion
-- jMessageDialog
  */
  

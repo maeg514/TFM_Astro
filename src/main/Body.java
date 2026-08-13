@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Arrays;
+
 public class Body {
     private final String name;
     private final double mass;
@@ -125,6 +127,15 @@ public class Body {
         return vectorVelocity;
     }
 
+
+    /**
+     * Calculates the Right Ascension (RA) and Declination (Dec) for a body observed from a position defined by the vector.
+     *
+     * @param body Body observed.
+     * @param obsPos Vector indicating the position from which the body is observed,
+     *               if null then the geometric center of this body is considered as the position of observation.
+     * @return A {@code double[]} containing the calculated RA, Dec and distance for the observed body.
+     */
     public double[] ra_dec(Body body, double[] obsPos) {
         double ra, dec, distance;
 
@@ -153,6 +164,16 @@ public class Body {
         return new double[]{ra, dec, distance};
     }
 
+    /**
+     * Creates a String describing the main characteristics of the body needed for a quick print.
+     *
+     * @return A {@code String} containing name, position and velocity of the body.
+     */
+    @Override
+    public String toString() {
 
-
+        return String.format("%-20s", this.getName()) + ": " +
+                String.format("%-22s", positionInitial[0]) + ", " + String.format("%-22s", positionInitial[1]) + ", " + String.format("%-22s", positionInitial[2]) + " | " +
+                String.format("%-22s", velocityInitial[0]) + ", " + String.format("%-22s", velocityInitial[1]) + ", " + String.format("%-22s", velocityInitial[2]) + "\n";
+    }
 }

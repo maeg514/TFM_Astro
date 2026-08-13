@@ -21,7 +21,7 @@ public class Constants {
 
     /** Earth radius in AU. */
     public static final double EARTH_RADIUS = 6378.13659999999982 / AU;
-    public static final double J2_DIMENSIONLESS = 0.00108262539;
+    public static final double J2_DIMENSIONLESS = 0.00108262539;  //TODO es este valor correcto?
     public static final double J2 = J2_DIMENSIONLESS * Math.pow(EARTH_RADIUS, 2) * G * MASS_EARTH;
 
     /** Radians to degrees. */
@@ -122,6 +122,51 @@ public class Constants {
 
     /** Normalized mass for Ceres. */
     public static final double MASS_CERES = 4.719142E-10;
+
+    /** Normalized mass for Vesta. */
+    public static final double MASS_VESTA = 1.302684e-10;
+
+    /** Normalized mass for Pallas. */
+    public static final double MASS_PALLAS = 1.029736e-10;
+
+    /** Normalized mass for Hygiea. */
+    public static final double MASS_HYGIEA = 4.238599e-11;
+
+    /** Normalized mass for Davida. */
+    public static final double MASS_DAVIDA = 2.934528e-11;
+
+    /** Normalized mass for Interamnia. */
+    public static final double MASS_INTERAMNIA = 2.132739e-11;
+
+    /** Normalized mass for Europa. */
+    public static final double MASS_EUROPA = 2.021691e-11;
+
+    /** Normalized mass for Sylvia. */
+    public static final double MASS_SYLVIA = 1.633782e-11;
+
+    /** Normalized mass for Eunomia. */
+    public static final double MASS_EUNOMIA = 1.524364e-11;
+
+    /** Normalized mass for Juno. */
+    public static final double MASS_JUNO = 1.447167e-11;
+
+    /** Normalized mass for Psyche. */
+    public static final double MASS_PSYCHE = 1.197822e-11;
+
+    /** Normalized mass for Camilla. */
+    public static final double MASS_CAMILLA = 1.087870e-11;
+
+    /** Normalized mass for Thisbe. */
+    public static final double MASS_THISBE = 8.965307e-12;
+
+    /** Normalized mass for Iris. */
+    public static final double MASS_IRIS = 8.589039e-12;
+
+    /** Normalized mass for Euphrosyne. */
+    public static final double MASS_EUPHROSYNE = 8.133160e-12;
+
+    /** Normalized mass for Cybele. */
+    public static final double MASS_CYBELE = 7.068710e-12;
 
     /** Background color for the text area. */
     public static final Color colorBackground = Color.decode("#222222");
