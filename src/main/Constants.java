@@ -3,7 +3,7 @@ package main;
 import java.awt.*;
 
 public class Constants {
-    /** Gravitational Constant in UA/day. */
+    /** Gaussian Gravitational constant in AU^3/day^2 (equals to k^2). */
     public static final double G = 2.9591220828411956E-04;
 
     /** Astronomical Unit in km. As defined by JPL in DE440. */
@@ -13,7 +13,9 @@ public class Constants {
     public static final double SPEED_OF_LIGHT = 299792458.0;
 
     /** Speed of light in AU/day. */
-    public static final double c = (SPEED_OF_LIGHT * 0.001 / AU) * 86400.0;// En UA/dia
+    public static final double c = (SPEED_OF_LIGHT * 0.001 / AU) * 86400.0;
+
+    /** Gravitational parameter in AU. */
     public static final double mu = G / Math.pow(c, 2);
 
     /** Normalized mass for the Earth. */
@@ -21,7 +23,11 @@ public class Constants {
 
     /** Earth radius in AU. */
     public static final double EARTH_RADIUS = 6378.13659999999982 / AU;
+
+    /** Coefficient is a dimensionless parameter that quantifies the Earth's equatorial bulge (oblateness). */
     public static final double J2_DIMENSIONLESS = 0.00108262539;  //TODO es este valor correcto?
+
+    /**  Earth's oblateness coefficient with AU^5/day^2 dimension. */
     public static final double J2 = J2_DIMENSIONLESS * Math.pow(EARTH_RADIUS, 2) * G * MASS_EARTH;
 
     /** Radians to degrees. */
@@ -174,10 +180,6 @@ public class Constants {
     /** Color text for the text area. */
     public static final Color colorText = Color.decode("#d6753d");
 
-
-    //Ascii jpl ephemerides
-
-    //Hay una incertidumbre en la masa de los planetas, por eso hay una diferencia entre las masas en las distintas fuentes
 
 
 }

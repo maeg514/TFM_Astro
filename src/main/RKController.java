@@ -18,16 +18,26 @@ public class RKController {
 
         long currentTime = System.currentTimeMillis();
 
-        double ttMinusUt = 69.185 / Constants.SECONDS_PER_DAY;
-        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC
+
+        //Apophis
+        /*double ttMinusUt = 69.185 / Constants.SECONDS_PER_DAY;
+        double jd = Utility.dateToJulianDay(2029, 4, 13, 21, 38, false); // UTC*/
+
+        //2024 YR4
+        double ttMinusUt = 69.183627 / Constants.SECONDS_PER_DAY;
+        double jd = Utility.dateToJulianDay(2032, 12, 22, 8, 24, false);
+
+
+        double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
+        double integrationStep2 = 0.1;
+
+        //double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
         //double jd = main.Constants.dateToJulianDay(2024,1,1,12,0,false); // UTC
         //double jd = Utility.dateToJulianDay(2025,6,26,2,45,false); // UTC
-        double integrationEndTime = 1.0; // jd - 2451545.0; (TDB) // Diferencia entre TT
-        double integrationEndTime2 = jd - 2451545.0 + ttMinusUt;
         //double integrationEndTime2 = jd - 2451545.0;
-        double integrationEndTime3 = 0.2;
-        double integrationStep2 = 0.075;
-        double integrationStep = 1.0;
+        //double integrationEndTime3 = 0.2;
+        //double integrationStep = 1.0;
+
         System.out.println("Integration End Time should be: " + integrationEndTime2);
 
 
@@ -53,6 +63,9 @@ public class RKController {
 
         System.out.println(objects.ra_dec("Earth", topocentric));
 
+        List<String> bodyList = List.of("Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Sun", "2024 YR4", "Moon");
+
+        objects.saveInFile("2024YR4_RK5_025_v2", bodyList);
 
         long endTime = System.currentTimeMillis();
         double elapsed = (endTime - currentTime) * 0.001;

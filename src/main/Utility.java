@@ -25,6 +25,16 @@ public class Utility {
         return (int) (365.25 * (year + 4716)) + (int) (30.6001 * (month + 1)) + day + b - 1524.5 + c;
     }
 
+    /**
+     * Computes nutation in longitude and obliquity.
+     *
+     * @param jd_ut Julian day in UT.
+     * @param ttMinusUT a.
+     * @param obsLon Longitude coordinate of the observer.
+     * @param obsLat Latitude coordinate of the observer.
+     * @param obsAlt Altitude of the observer.
+     * @return Nutation angles in radians.
+     */
     public static double[] vectorObserver(double jd_ut, double ttMinusUT, double obsLon, double obsLat, double obsAlt) {
         double lst = Utility.localApparentSiderealTime(jd_ut, ttMinusUT, obsLon);
         double geocLat = (obsLat - .1925 * Math.sin(2 * obsLat) * main.Constants.DEG_TO_RAD);
@@ -138,20 +148,6 @@ public class Utility {
             r_2 += bodyVector[i] * bodyVector[i];
         }
         return Math.sqrt(r_2);
-    }
-
-
-    public static String matrixToString(double[][] matriz) {
-        StringBuilder sb = new StringBuilder();
-
-        for (double[] fila : matriz) {
-            for (double valor : fila) {
-                sb.append(String.format("%10.10f", valor)).append(" ");
-            }
-            sb.append("\n");
-        }
-
-        return sb.toString();
     }
 
 

@@ -30,27 +30,15 @@ public class RungeKutta {
         double[][] coefPosicion = positionCoefficients;
         double[] coefRunge = rkCoefficients;
 
-
         int N = (int) ((b - a) / h);
         double lastH = (b - a) % h;
 
-        double lastHC = b - a - N * h;
-        /*
-        Integration End Time should be: 10695.402189641029
-        el valor de h es: 0.075
-        142605
-        0.027189641028994807
-        Time (integration end): 10695.402189641029
-        */
         System.out.println("el valor de h es: " + h); // TODO Lanzar excepción y poner en un método el cálculo de N
         double time = 0;
 
-
-        System.out.println(N);
-        System.out.println(lastH);
-        System.out.println(lastHC);
-
         for (int i = 0; i < N + 1; i++) {
+
+            time = a + N * h;
 
             if (i == N) {
                 if (lastH == 0) break;
@@ -67,7 +55,6 @@ public class RungeKutta {
                         if (j > 0) {
                             for (int n = 0; n < j; n++) {
                                 delta_PosVel[l][m] += coefPosicion[j - 1][n] * k[l][n][m];
-                                //System.out.println(coefPosicion[j - 1][n] + " * " + k[l][n][m]);
                                 delta_PosVel[l][m + 3] += coefPosicion[j - 1][n] * k[l][n][m + 3];
                             }
                         } else {
@@ -78,24 +65,19 @@ public class RungeKutta {
                         pos_vel_acc_Integration[l][0][m] = pos_vel_Initial[l][m] + delta_PosVel[l][m];
                         pos_vel_acc_Integration[l][1][m] = pos_vel_Initial[l][m + 3] + delta_PosVel[l][m + 3];
                     }
-                    //System.out.println(Arrays.toString(delta_PosVel[l][0]));
 
                 }
 
 
                 for (int l = 0; l < bodies.size(); l++) {
-                    funcionYPrima(l, h);
+                    funcionYPrima(l);
                 }
 
                 for (int l = 0; l < bodies.size(); l++) {
                     for (int m = 0; m < 3; m++) {
                         k[l][j][m + 3] = pos_vel_acc_Integration[l][2][m] * h;
                         k[l][j][m] = pos_vel_acc_Integration[l][1][m] * h;
-                        //System.out.println(Arrays.toString(pos_vel_acc_Integration[l][2]) + " a ");
-                        //System.out.println(Arrays.toString(pos_vel_acc_Integration[l][1]) + "v ");
-
                     }
-                    //System.out.println(Arrays.toString(k[l][j]));
                 }
 
             }
@@ -108,8 +90,6 @@ public class RungeKutta {
                     for (int j = 0; j < coefRunge.length; j++) {
                         positionIncrement += coefRunge[j] * k[l][j][m];
                         velIncrement += coefRunge[j] * k[l][j][m + 3];
-                        //System.out.println(positionIncrement + " p " + coefRunge[j] + " / " + k[l][j][m]);
-                        //System.out.println(velIncrement + "v " + k[l][j][m + 3]);
                     }
                     pos_vel_Initial[l][m] += positionIncrement;
                     pos_vel_Initial[l][m + 3] += velIncrement;
@@ -127,7 +107,7 @@ public class RungeKutta {
 
     }
 
-    public void funcionYPrima(int l, double h) {
+    public void funcionYPrima(int l) {
         Body body = bodies.get(l);
         double[] posBody = pos_vel_acc_Integration[l][0];
         double[] accBody = new double[3];
@@ -147,7 +127,7 @@ public class RungeKutta {
                 }
             }
 
-            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("Apophis"))) {
+            if (bodyLoop.getName().equals("Earth") && (body.getName().equals("Moon") || body.getName().equals("2024 YR4"))) {
                 earthsFlatteningFactor(posBody, posBodyLoop, accBody, distance);
             }
 
@@ -161,6 +141,14 @@ public class RungeKutta {
 
     }
 
+    /**
+     * Calculates relativistic accelerations for bodies interacting with the Sun.
+     *
+     * @param l Index number for the affected body.
+     * @param b Index number for the Sun.
+     * @param ac Actual value for the acceleration of the minor body.
+     * @param d Distance between the asteroid and the Sun.
+     */
     private void relativisticAcceleration(int l, int b, double[] ac, double d) {
         double pv = 0, v2 = 0;
         double[] posBody = pos_vel_acc_Integration[l][0];
@@ -195,7 +183,15 @@ public class RungeKutta {
         ac[2] += global_factor * vectorAux[2] * (3 * Math.pow(vectorAux[2], 2) - 4.5 * factor_xy_squared_sum);
     }
 
-    // Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.
+
+    /**
+     * Calculates accelerations on Apophis due to non-gravitational forces, see Marsden et al. (1973), Astron. J. 78, 211-225.
+     *
+     * @param l Index number for the asteroid.
+     * @param b Index number for the Sun.
+     * @param ac Actual value for the acceleration of the minor body.
+     * @param r Distance between the asteroid and the Sun.
+     */
     private void apophisNGF(int l, int b, double[] ac, double r) {
         double[] posAux = new double[3];
         double[] velAux = new double[3];
@@ -218,7 +214,7 @@ public class RungeKutta {
 
         // Multiplication factors. NGF (A) values are read in AU/s^2. a3 = 0 for Apophis
         double a1 = 4.999999873689E-13 / r;
-        double a2 = -2.901766720242E-14 / Math.sqrt(tx * tx + ty * ty + tz * tz);
+        double a2 = -2.901766720242E-14 / Math.sqrt(tx * tx + ty * ty + tz * tz); //Distinto valor que JPL // no hay valores para 2024 YR4?
 
         // X, Y and Z components of non-gravitational acceleration
         ac[0] -= (a1 * posAux[0] + a2 * tx) / r2;//Corregido esto, estaba mal el signo
@@ -226,6 +222,12 @@ public class RungeKutta {
         ac[2] -= (a1 * posAux[2] + a2 * tz) / r2;
     }
 
+    /**
+     * Receives a list of bodies and saves them in an array for the efficiency of the RK method.
+     *
+     * @param bodies List of bodies that participate in the numerical integration of this Java class.
+     * @return Array containing the initial values for position and velocity.
+     */
     public double[][] bodiesIntoArray(List<Body> bodies) {
         double[][] initial_posVel = new double[bodies.size()][6];
         for (int i = 0; i < bodies.size(); i++) {
@@ -240,6 +242,9 @@ public class RungeKutta {
         return initial_posVel;
     }
 
+    /**
+     * Introduces the values calculated in the RK method to the corresponding bodies.
+     */
     public void arrayIntoBodies(){
         for (int i = 0; i < pos_vel_Initial.length; i++) {
             Body bodyLoop = bodies.get(i);
@@ -254,6 +259,13 @@ public class RungeKutta {
         }
     }
 
+    /**
+     * Calculates the distance between two bodies.
+     *
+     * @param l Index number for the body distanced.
+     * @param b Index number for the body which is the center of the coordinates.
+     * @return Distance in AU.
+     */
     private double distanceBetweenBodies(int l, int b) {
         double r_2 = 0;
         double[] posBody = pos_vel_acc_Integration[l][0];
@@ -265,10 +277,12 @@ public class RungeKutta {
         return Math.sqrt(r_2);
     }
 
-    public double[][] getPos_vel_Initial() {
-        return pos_vel_Initial;
-    }
 
+    /**
+     * Returns the list of bodies used in the integration.
+     *
+     * @return List of bodies.
+     */
     public List<Body> getBodies() {
         return bodies;
     }

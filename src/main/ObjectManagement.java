@@ -1,5 +1,8 @@
 package main;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class ObjectManagement {
@@ -74,7 +77,8 @@ public class ObjectManagement {
 
         // Cuerpos de estudio
         Body apophis = new Body("Apophis", 0, new double[]{-1.037925696098939E+00, -1.268092611036419E-01, -7.404282940432429E-02}, new double[]{4.227374301759195E-03, -1.412107207094790E-02, -5.145341154842345E-03});
-        Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.594982968163765E-01, -2.604198475987155E+00, -1.161962651207284E+00}, new double[]{7.551958208069564E-03, 5.004810090096610E-03, 2.674350852357362E-03});
+        //Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.594982968163765E-01, -2.604198475987155E+00, -1.161962651207284E+00}, new double[]{7.551958208069564E-03, 5.004810090096610E-03, 2.674350852357362E-03}); // Valor antiguo
+        Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.596307168653424E-01, -2.604287454649033E+00, -1.162009799132625E+00}, new double[]{7.551896469920276E-03, 5.004225858848752E-03, 2.674091869770479E-03});
         Body C3IATLAS = new Body("3I/ATLAS", 0, new double[]{1.253897637473739E+02, -2.721809832353439E+02, -1.037600160708741E+02}, new double[]{-1.340809972204520E-02, 2.869866907957716E-02, 1.095113063192082E-02});
 
         // Imágenes
@@ -96,10 +100,11 @@ public class ObjectManagement {
         bodies.put(pluto.getName(), pluto);
         bodies.put(moon.getName(), moon);
 
-        bodies.put(apophis.getName(), apophis);
+        //bodies.put(apophis.getName(), apophis);
+        bodies.put(A2024YR4.getName(), A2024YR4);
         //bodies.put(kibeshigemaro.getName(), kibeshigemaro);
 
-/*
+
         bodies.put(ceres.getName(), ceres);
         bodies.put(vesta.getName(), vesta);
         bodies.put(pallas.getName(), pallas);
@@ -115,7 +120,7 @@ public class ObjectManagement {
         bodies.put(thisbe.getName(), thisbe);
         bodies.put(iris.getName(), iris);
         bodies.put(euphrosyne.getName(), euphrosyne);
-        bodies.put(cybele.getName(),cybele);*/
+        bodies.put(cybele.getName(),cybele);
     }
 
     public HashMap<String, Body> getBodies() {
@@ -236,6 +241,38 @@ public class ObjectManagement {
     }
 
 
+    /**
+     * Saves RA and Dec for the bodies in the list in a file,
+     *
+     * @param filename Name of the file.
+     * @param objectListName List of the bodies' name chosen to bew saved.
+     */
+    public void saveInFile(String filename, List<String> objectListName){
+        File directory = new File("src/resources");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        File archivo = new File(directory, filename);
+
+        try {
+            FileWriter writer = new FileWriter(archivo);
+
+            Body bodyReference = bodies.get("Earth");
+            for (String objectWrite : objectListName) {
+                Body bodyWrite = bodies.get(objectWrite);
+                double[] ra_dec = bodyReference.ra_dec(bodyWrite, null);
+                StringBuilder sb = new StringBuilder(bodyWrite.getName());
+                sb.append(",").append(String.format(Locale.US, "%10.10f", ra_dec[0])).append(",").append(String.format(Locale.US, "%10.10f", ra_dec[1])).append("\n");
+                writer.write(sb.toString());
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+/*
     private boolean changesChecking() {
         boolean change = false;
         double[][] vectorChecking = {
@@ -272,20 +309,7 @@ public class ObjectManagement {
             System.out.println(Arrays.toString(fila));
         }
         return change;
-    }
+    }*/
 
 
-    private double[][] bodiesIntoArray(List<Body> bodies) {
-        double[][] initial_posVel = new double[bodies.size()][6];
-        for (int i = 0; i < bodies.size(); i++) {
-            double[] pos = bodies.get(i).getPositionInitial().clone();
-            double[] vel = bodies.get(i).getVelocityInitial().clone();
-
-            for (int j = 0; j < 3; j++) {
-                initial_posVel[i][j] = pos[j];
-                initial_posVel[i][j + 3] = vel[j];
-            }
-        }
-        return initial_posVel;
-    }
 }

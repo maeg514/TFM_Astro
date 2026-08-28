@@ -161,6 +161,8 @@ public class Body {
         ra = Math.atan2(skyPosition[1], skyPosition[0]) * 180 / Math.PI;
         dec = Math.atan2(skyPosition[2], h) * 180 / Math.PI;
 
+        if (ra<0) ra+=360.0;
+
         return new double[]{ra, dec, distance};
     }
 

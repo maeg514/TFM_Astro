@@ -1,24 +1,42 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Comprobaciones {
+    public static final Map<String, String> objects = new HashMap<>();
+
+
     public static void main(String[] args) throws IOException, URISyntaxException {
-        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
+        addObjects();
+
+        //List<String> bodyList = List.of("1", "2", "4", "5", "6", "7", "8", "9", "10", "Apophis", "301"); //DES=20099942
+        List<String> bodyList = List.of("1", "2", "4", "5", "6", "7", "8", "9", "10", "DES=54509621", "301");
+
+
+        writeIntoFile("2024YR4_JPL", bodyList, "2032-12-22%2008:24:00%20UTC", "2032-12-23", "1d");
+
+        /*
+        String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
         String url2 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
-                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
-        /*String resultado = query(url);
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        String url3 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27DES=20099942%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
+                "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        String resultado = query(url3);
         System.out.println(resultado);*/
 
 
@@ -58,33 +76,76 @@ public class Comprobaciones {
             if (take) {
                 if (!inputLine.contains("$$EOE")) {
                     output.append(inputLine).append("\n");
-                }else {
+                } else {
                     finished = true;
                 }
             }
             if (inputLine.contains("$$SOE")) take = true;
         }
         in.close();
-        return output.toString();
+        String outputforChop = output.toString();
+        String[] trozos = outputforChop.split("\\s+");
+        return trozos[trozos.length - 2] + "," + trozos[trozos.length - 1];
     }
 
-    // X = -1.455656900545057E-04 Y = 1.751927427817715E-04 Z = 1.141817805459706E-04    JPL
-    // X = -1.4500160886044E-4    Y = 1.7578322869904461E-4 Z = 1.1475726733700675E-4    POO
-    // X = -1.4649900667473847E-4 Y = 1.7717332974365174E-4 Z = 1.1519435237661302E-4    EOO
 
-    // Apophis | 129.72265        :  26.62301              JPL
-    // Apophis | 129.5186956031062:  26.728963197811982    POO
-    // Apophis | 129.58611425722697: 26.612975937764222    EOO
+    /**
+     * Saves in a file the result of the HTTP query for the selected bodies and chosen options for start, end and step size.
+     * @param filename Name of the file.
+     * @param objectList List of objects to be queried.
+     * @param startTime String containing the start time with the next format: "2029-04-13%2021:38:00%20UTC"
+     * @param endTime String containing the end time with the next format: "2029-04-14"
+     * @param stepSize String containing the step size with one of this two formats: "1d" / "50"
+     */
+    public static void writeIntoFile(String filename, List<String> objectList, String startTime, String endTime, String stepSize) {
+        File directory = new File("src/resources");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        File archivo = new File(directory, filename);
 
-    // Pluto(Sun):
-    // X = 22.39145277362250  Y = -24.60284945484394 Z = -14.42456582921362   JPL
-    // X = 22.342215393477137 Y = -24.52871026222943 Z = -14.39150456821061   POO
-    // X = 22.342215393477137 Y = -24.52871026222943 Z = -14.39150456821061   EOO
+        try {
+            FileWriter writer = new FileWriter(archivo);
 
-    // Apohphis(Sun):
-    // X = -0.9175567641209890 Y = -0.3716242567082039 Z = -0.1610482740289097    JPL
-    // X = -0.9667985251201395 Y = -0.2974911182695593 Z = -0.12799842656284177   POO
-    // X = -0.9668000225179538 Y = -0.2974897281685147 Z = -0.12799798947780217   EOO
+            for (String object : objectList) {
+                //startime formato: "2029-04-13%2021:38:00%20UTC
+                // endtime formato: "2029-04-14"
+                // stepsize formato: "1d" / "50"
+                String urlObserver = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27" + object + "%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
+                        "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%27" + startTime + "%27&STOP_TIME=%27" + endTime +
+                        "%27&STEP_SIZE=%27" + stepSize + "%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+
+                String texto = query(urlObserver);
+                writer.write(objects.get(object) + "," + texto + "\n");
+            }
+
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    /**
+     * Adds objects to the hashmap where ids for the fetching of HorizonsJPL.
+     */
+    public static void addObjects() {
+        objects.put("1", "Mercury");
+        objects.put("2", "Venus");
+        objects.put("3", "Earth");
+        objects.put("4", "Mars");
+        objects.put("5", "Jupiter");
+        objects.put("6", "Saturn");
+        objects.put("7", "Uranus");
+        objects.put("8", "Neptune");
+        objects.put("9", "Pluto");
+        objects.put("10", "Sun");
+        objects.put("Apophis", "Apophis");
+        objects.put("DES=54509621", "2024 YR4");
+        objects.put("301", "Moon");
+    }
 
 
 }
