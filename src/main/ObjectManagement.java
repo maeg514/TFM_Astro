@@ -77,7 +77,6 @@ public class ObjectManagement {
 
         // Cuerpos de estudio
         Body apophis = new Body("Apophis", 0, new double[]{-1.037925696098939E+00, -1.268092611036419E-01, -7.404282940432429E-02}, new double[]{4.227374301759195E-03, -1.412107207094790E-02, -5.145341154842345E-03});
-        //Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.594982968163765E-01, -2.604198475987155E+00, -1.161962651207284E+00}, new double[]{7.551958208069564E-03, 5.004810090096610E-03, 2.674350852357362E-03}); // Valor antiguo
         Body A2024YR4 = new Body("2024 YR4", 0, new double[]{-2.596307168653424E-01, -2.604287454649033E+00, -1.162009799132625E+00}, new double[]{7.551896469920276E-03, 5.004225858848752E-03, 2.674091869770479E-03});
         Body C3IATLAS = new Body("3I/ATLAS", 0, new double[]{1.253897637473739E+02, -2.721809832353439E+02, -1.037600160708741E+02}, new double[]{-1.340809972204520E-02, 2.869866907957716E-02, 1.095113063192082E-02});
 
@@ -101,10 +100,10 @@ public class ObjectManagement {
         bodies.put(moon.getName(), moon);
 
         //bodies.put(apophis.getName(), apophis);
-        bodies.put(A2024YR4.getName(), A2024YR4);
+        //bodies.put(A2024YR4.getName(), A2024YR4);
         //bodies.put(kibeshigemaro.getName(), kibeshigemaro);
 
-
+/*
         bodies.put(ceres.getName(), ceres);
         bodies.put(vesta.getName(), vesta);
         bodies.put(pallas.getName(), pallas);
@@ -120,7 +119,7 @@ public class ObjectManagement {
         bodies.put(thisbe.getName(), thisbe);
         bodies.put(iris.getName(), iris);
         bodies.put(euphrosyne.getName(), euphrosyne);
-        bodies.put(cybele.getName(),cybele);
+        bodies.put(cybele.getName(),cybele);*/
     }
 
     public HashMap<String, Body> getBodies() {
@@ -247,23 +246,36 @@ public class ObjectManagement {
      * @param filename Name of the file.
      * @param objectListName List of the bodies' name chosen to bew saved.
      */
-    public void saveInFile(String filename, List<String> objectListName){
-        File directory = new File("src/resources");
+    public void saveInFile(String filename, List<String> objectListName, boolean vector, boolean append){
+        File directory = new File("src/main/java/resources");
         if (!directory.exists()) {
             directory.mkdirs();
         }
         File archivo = new File(directory, filename);
 
         try {
-            FileWriter writer = new FileWriter(archivo);
+            FileWriter writer = new FileWriter(archivo, append);
 
-            Body bodyReference = bodies.get("Earth");
-            for (String objectWrite : objectListName) {
-                Body bodyWrite = bodies.get(objectWrite);
-                double[] ra_dec = bodyReference.ra_dec(bodyWrite, null);
-                StringBuilder sb = new StringBuilder(bodyWrite.getName());
-                sb.append(",").append(String.format(Locale.US, "%10.10f", ra_dec[0])).append(",").append(String.format(Locale.US, "%10.10f", ra_dec[1])).append("\n");
-                writer.write(sb.toString());
+            Body bodyReference = bodies.get("Sun");
+
+            if (vector){
+                for (String objectWrite : objectListName) {
+                    StringBuilder sb = new StringBuilder();
+                    Body bodyPrint = bodies.get(objectWrite);
+                    double[] p = bodyReference.distanceVector(bodyPrint);
+                    sb.append("1, ").append(bodyPrint.getName()).append(", ").append(String.format("%-22s", p[0])).append(", ").append(String.format("%-22s", p[1])).append(", ").append(String.format("%-22s", p[2]));
+                    writer.write(sb.toString());
+                    writer.write(System.lineSeparator());
+                }
+
+            }else {
+                for (String objectWrite : objectListName) {
+                    Body bodyWrite = bodies.get(objectWrite);
+                    double[] ra_dec = bodyReference.ra_dec(bodyWrite, null);
+                    StringBuilder sb = new StringBuilder(bodyWrite.getName());
+                    sb.append(",").append(String.format(Locale.US, "%10.10f", ra_dec[0])).append(",").append(String.format(Locale.US, "%10.10f", ra_dec[1])).append("\n");
+                    writer.write(sb.toString());
+                }
             }
 
             writer.close();
@@ -271,45 +283,6 @@ public class ObjectManagement {
             e.printStackTrace();
         }
     }
-
-/*
-    private boolean changesChecking() {
-        boolean change = false;
-        double[][] vectorChecking = {
-                {-0.049242309887471504, 0.074132509477252, 0.0330492542781804, -6.638840273079683E-6, 1.1333410836986347E-5, 5.020739495743468E-6},
-                {-0.1760739199818666, 0.32571526005188833, 0.18059095619818513, -0.03143059302208097, -0.010193391021771555, -0.0021899646768472115},
-                {0.5307088992946106, 0.4815037437874529, 0.17966823928803466, -0.012152513410775403, 0.014445939303657404, 0.00726875747899652},
-                {-0.9666535235112791, -0.29766690149825836, -0.12811318383017878, 0.006667698406407208, -0.014492822729155636, -0.006281995555942135},
-                {-1.6366682834390605, -0.28430391930889515, -0.08855073053025654, 0.0037495327509574727, -0.011242415373455425, -0.005258152056345891},
-                {-5.092976239731671, -1.868012145731055, -0.6766246251589241, 0.0027644573490153133, -0.006065485255554673, -0.0026671084712878933},
-                {6.620173515580458, 5.99993594982585, 2.1933532843135004, -0.004135579566238353, 0.003682250293646825, 0.001699081484892807},
-                {5.481440243214165, 17.010830890611494, 7.372570789687953, -0.003801828505975123, 8.534638617653026E-4, 4.2754997070165826E-4},
-                {29.491198701523263, 4.311806999682784, 1.0320551034608143, -4.7644648041138786E-4, 0.0028954220548403336, 0.0011971054423927895},
-                {-0.9641781702968775, -0.29675226035312885, -0.12746905047546234, 0.006437865411518236, -0.014017476469827213, -0.0060915920244318},
-                {22.342215393477137, -24.52871026222943, -14.39150456821061, 0.0025554516150016306, 0.0014851518811703145, -3.071722236487479E-4},
-                {-0.9668011993134284, -0.2974885677327149, -0.127997618542421, 0.010258531574114051, -0.013057629302864146, -0.004487815348114064},
-        };
-
-        double[][] differences = new double[bodies.size()][6];
-
-        for (int i = 0; i < bodies.size(); i++) {
-            Body bodyCheck = bodies.get(i);
-            double[] posCheck = bodyCheck.getPositionInitial();
-            double[] velCheck = bodyCheck.getVelocityInitial();
-            for (int j = 0; j < 3; j++) {
-                differences[i][j] = posCheck[j] - vectorChecking[i][j];
-                differences[i][j + 3] = velCheck[j] - vectorChecking[i][j + 3];
-                if (!change) {
-                    if (differences[i][j] != 0 || differences[i][j + 3] != 0) change = true;
-                }
-            }
-        }
-
-        for (double[] fila : differences) {
-            System.out.println(Arrays.toString(fila));
-        }
-        return change;
-    }*/
 
 
 }

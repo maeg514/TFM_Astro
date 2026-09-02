@@ -6,9 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +18,14 @@ public class Comprobaciones {
         addObjects();
 
         //List<String> bodyList = List.of("1", "2", "4", "5", "6", "7", "8", "9", "10", "Apophis", "301"); //DES=20099942
-        List<String> bodyList = List.of("1", "2", "4", "5", "6", "7", "8", "9", "10", "DES=54509621", "301");
+        //List<String> bodyList = List.of("1", "2", "4", "5", "6", "7", "8", "9", "10", "DES=54509621", "301");
+        List<String> bodyList = List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "301");
 
 
-        writeIntoFile("2024YR4_JPL", bodyList, "2032-12-22%2008:24:00%20UTC", "2032-12-23", "1d");
+        //writeIntoFile("2024YR4_JPL", bodyList, "2032-12-22%2008:24:00%20UTC", "2032-12-23", "1d");
+        writeIntoFile("JPL_Errores2000", bodyList, "JD%201721424%20UTC", "JD%201721424.5", "1d");
 
-        /*
+/*
         String url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27Apophis%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTORS%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271,9,20%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
@@ -36,7 +35,13 @@ public class Comprobaciones {
         String url3 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27DES=20099942%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
                 "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%272029-04-13%2021:38:00%20UTC%27&STOP_TIME=%272029-04-14" +
                 "%27&STEP_SIZE=%271d%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
-        String resultado = query(url3);
+        String url4 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%271%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTOR%27" +
+                "&OUT_UNITS=%27AU-D%27&CENTER=%27500@10%27&ANG_FORMAT=%27DEG%27&START_TIME=%27A.D.%200800-01-01%2012:00:00%20UTC%27&STOP_TIME=%27A.D.%200800-01-02%2000:00:00" +
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        String url5 = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%271%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTOR%27" +
+                "&OUT_UNITS=%27AU-D%27&CENTER=%27500@10%27&ANG_FORMAT=%27DEG%27&START_TIME=%27JD%202013258%20UTC%27&STOP_TIME=%27JD%202013258.5" +
+                "%27&STEP_SIZE=%271d%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
+        String resultado = query(url5);
         System.out.println(resultado);*/
 
 
@@ -83,9 +88,12 @@ public class Comprobaciones {
             if (inputLine.contains("$$SOE")) take = true;
         }
         in.close();
-        String outputforChop = output.toString();
+        /*String outputforChop = output.toString();
         String[] trozos = outputforChop.split("\\s+");
-        return trozos[trozos.length - 2] + "," + trozos[trozos.length - 1];
+        return trozos[trozos.length - 2] + "," + trozos[trozos.length - 1];*/
+        String lineaXYZ = output.substring(output.indexOf("X =")).split("\n")[0];
+
+        return lineaXYZ.replace("X =", "").replace("Y =", "").replace("Z =", "").trim().replaceAll("\\s+", ",");
     }
 
 
@@ -98,25 +106,28 @@ public class Comprobaciones {
      * @param stepSize String containing the step size with one of this two formats: "1d" / "50"
      */
     public static void writeIntoFile(String filename, List<String> objectList, String startTime, String endTime, String stepSize) {
-        File directory = new File("src/resources");
+        File directory = new File("src/main/java/resources");
         if (!directory.exists()) {
             directory.mkdirs();
         }
         File archivo = new File(directory, filename);
 
         try {
-            FileWriter writer = new FileWriter(archivo);
+            FileWriter writer = new FileWriter(archivo,true);
 
             for (String object : objectList) {
                 //startime formato: "2029-04-13%2021:38:00%20UTC
                 // endtime formato: "2029-04-14"
                 // stepsize formato: "1d" / "50"
-                String urlObserver = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27" + object + "%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27" +
-                        "&OUT_UNITS=%27AU-D%27&CENTER=%27500%27&ANG_FORMAT=%27DEG%27&START_TIME=%27" + startTime + "%27&STOP_TIME=%27" + endTime +
+
+                String urlObserver = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27" + object + "%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27VECTOR%27" +
+                        "&OUT_UNITS=%27AU-D%27&CENTER=%27500@10%27&ANG_FORMAT=%27DEG%27&START_TIME=%27" + startTime + "%27&STOP_TIME=%27" + endTime +
                         "%27&STEP_SIZE=%27" + stepSize + "%27&QUANTITIES=%271%27&ECLIP=%27J2000%27&VEC_CORR=%27NONE%27&OBJ_DATA=%27NO%27&REF_PLANE=%27FRAME%27";
 
                 String texto = query(urlObserver);
-                writer.write(objects.get(object) + "," + texto + "\n");
+                String objectName = objects.get(object);
+                writer.write("1, " + objectName + ", " + texto);
+                writer.write(System.lineSeparator());
             }
 
             writer.close();
@@ -146,6 +157,5 @@ public class Comprobaciones {
         objects.put("DES=54509621", "2024 YR4");
         objects.put("301", "Moon");
     }
-
 
 }

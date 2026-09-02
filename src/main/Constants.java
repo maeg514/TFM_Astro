@@ -178,7 +178,8 @@ public class Constants {
     public static final Color colorBackground = Color.decode("#222222");
 
     /** Color text for the text area. */
-    public static final Color colorText = Color.decode("#d6753d");
+    public static final Color colorText = Color.decode("#f76d02");
+
 
 
 
